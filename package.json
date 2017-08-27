@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "clusterfck": "^0.6.0",
     "d3": "^4.10.0",
     "lodash": "^4.17.4",
     "react": "^15.6.1",
