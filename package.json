@@ -15,5 +15,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "fluent-ffmpeg": "^2.1.2",
+    "youtube-dl": "^1.11.1"
   }
 }
