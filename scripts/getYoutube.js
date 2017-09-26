@@ -18,7 +18,7 @@ function getVideoData(video) {
   // write to file and return
   if (!videos.length) {
     console.log(videoData);
-    fs.writeFile('../data/youtube.json', JSON.stringify(videoData), 'utf-8');
+    fs.writeFile('../src/data/youtube.json', JSON.stringify(videoData), 'utf-8');
     return;
   }
 
@@ -34,8 +34,8 @@ function getVideoData(video) {
     })
     res.on('end', () => {
       data = JSON.parse(data);
-      var {snippet, statistics} = data.items[0];
-      videoData.push({snippet, statistics});
+      var {id, snippet, statistics} = data.items[0];
+      videoData.push({id, snippet, statistics});
 
       // download thumbnail image
       downloadImage(snippet.thumbnails.standard.url,
