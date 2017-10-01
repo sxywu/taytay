@@ -3,15 +3,21 @@ import * as d3 from 'd3';
 import _ from 'lodash';
 
 import Cluster from './Cluster';
-import videoData from './data/youtube.json';
+import videoData from './data/VuNIsY6JdUw.json';
 
 class App extends Component {
   render() {
-    var images = _.chain(videoData)
-      .takeRight(10)
-      .map(video => {
-        return (<Cluster key={video.id} video={video} />);
-      }).value();
+    console.log(videoData)
+
+    const videoId = 'VuNIsY6JdUw';
+    const images = _.map(videoData, image => {
+      return (
+        <div>
+          <img src={`${process.env.PUBLIC_URL}/images/${videoId}/${image.screenshot}`} />
+          <Cluster {...image} />
+        </div>
+      );
+    });
     return (
       <div className="App">
         {images}
