@@ -4,7 +4,7 @@ const getPixels = require('get-pixels');
 const clusterfck = require('clusterfck');
 
 const videoId = 'VuNIsY6JdUw';
-const videoFile = `./data/${videoId}.json`;
+const videoFile = `./src/data/${videoId}.json`;
 let videoData = fs.readFileSync(videoFile, 'utf-8');
 videoData = JSON.parse(videoData);
 
@@ -21,8 +21,8 @@ function getColorsForImage(image) {
     const colors = [];
 
     // get the colors
-    for (let x = 0; x < imageWidth; x += 12) {
-      for (let y = 0; y < imageHeight; y += 12) {
+    for (let x = 0; x < imageWidth; x += 1) {
+      for (let y = 0; y < imageHeight; y += 1) {
         let offset = x * 4 + y * 4 * imageWidth;
         let color = [imageData[offset + 0], imageData[offset + 1], imageData[offset + 2]];
         if (color.join(',') !== '0,0,0') {
