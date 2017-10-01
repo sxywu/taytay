@@ -8,7 +8,11 @@ const videoFile = `./data/${videoId}.json`;
 let videoData = fs.readFileSync(videoFile, 'utf-8');
 videoData = JSON.parse(videoData);
 
+let index = 0; // keeping track of which screenshot we're at
 function getColorsForImage(image) {
+  // if we've gone through all the images for video then stop
+  if (index === videoData.length) return;
+
   getPixels(`./screenshots/${videoId}/${image.screenshot}`, (err, pixels) => {
     if (err) return console.log(err);
 
@@ -46,6 +50,9 @@ function getColorsForImage(image) {
     image.colors = clusters;
     // save it to file
     fs.writeFileSync(videoFile, JSON.stringify(videoData));
+    // go to next image
+    index += 1;
+    getColorsForImage(videoData[index]);
   });
 }
 
@@ -58,4 +65,4 @@ function leaves(hcluster) {
    return leaves(hcluster.left).concat(leaves(hcluster.right));
 }
 
-getColorsForImage(videoData[0])
+getColorsForImage(videoData[index])
