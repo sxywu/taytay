@@ -28,6 +28,11 @@ function takeScreenshotForVideo(videoId, captions) {
     })
     .on('end', () => {
       console.log('Screenshots taken');
+      if (videosData.length) {
+        // only take screenshot for next video if there are still any videos left
+        const video = videosData.shift();
+        processVideo(video);
+      }
     })
     .on('error', (err) => {
       console.log('error: ', err.message);
@@ -77,4 +82,5 @@ function processVideo(video) {
   }
 }
 
-processVideo(videosData[0]);
+const video = videosData.shift();
+processVideo(video);
