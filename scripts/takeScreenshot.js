@@ -24,7 +24,7 @@ function takeScreenshotForVideo(videoId, captions) {
         caption.screenshot = filenames[i];
       });
       // save that to a file
-      fs.writeFileSync('./data/' + videoId + '.json', JSON.stringify(captions));
+      fs.writeFileSync('./src/data/' + videoId + '.json', JSON.stringify(captions));
     })
     .on('end', () => {
       console.log('Screenshots taken');
