@@ -20,6 +20,7 @@
   "devDependencies": {
     "fluent-ffmpeg": "^2.1.2",
     "get-pixels": "^3.3.0",
+    "get-video-duration": "^0.2.0",
     "vtt-to-json": "^0.1.1",
     "youtube-dl": "^1.11.1"
   }
