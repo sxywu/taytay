@@ -1,20 +1,24 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import _ from 'lodash';
+import chroma from 'chroma-js';
 
 import Cluster from './Cluster';
-import videoData from './data/VuNIsY6JdUw.json';
+import videosData from './data/youtube.json';
 
 class App extends Component {
   render() {
-    console.log(videoData)
+    const images = _.map(videosData, video => {
+      const videoData = require(`./data/${video.id}.json`);
+      const videoImage = videoData[Math.floor(videoData.length / 2)]; // take the middle screenshot
+      const colors = _.chain(videoData).map('colors').flatten()
+        .filter(color => chroma(color.color).hsl()[2] > 0.1)
+        .value();
 
-    const videoId = 'VuNIsY6JdUw';
-    const images = _.map(videoData, image => {
       return (
         <div>
-          <img src={`${process.env.PUBLIC_URL}/images/${videoId}/${image.screenshot}`} />
-          <Cluster {...image} />
+          <img src={`${process.env.PUBLIC_URL}/images/${video.id}/${videoImage.screenshot}`} />
+          <Cluster colors={colors} />
         </div>
       );
     });
