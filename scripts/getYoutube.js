@@ -2,8 +2,8 @@ var fs = require('fs');
 var https = require('https');
 var request = require('request');
 
-var key = fs.readFileSync('../key.txt', 'utf-8');
-var videos = fs.readFileSync('../data/mv.json', 'utf-8');
+var key = fs.readFileSync('./key.txt', 'utf-8');
+var videos = fs.readFileSync('./data/mv.json', 'utf-8');
 videos = JSON.parse(videos);
 var videoData = [];
 
@@ -14,14 +14,6 @@ function downloadImage(uri, filename, callback) {
 }
 
 function getVideoData(video) {
-  // if we've gotten data for all videos
-  // write to file and return
-  if (!videos.length) {
-    console.log(videoData);
-    fs.writeFile('../src/data/youtube.json', JSON.stringify(videoData), 'utf-8');
-    return;
-  }
-
   var url = 'https://www.googleapis.com/youtube/v3/videos?&key=' +
     key + '&id=' + video['Youtube Id'] + '&part=snippet,statistics';
 
@@ -37,14 +29,20 @@ function getVideoData(video) {
       var {id, snippet, statistics} = data.items[0];
       videoData.push({id, snippet, statistics});
 
-      // download thumbnail image
-      downloadImage(snippet.thumbnails.standard.url,
-        '../src/images/' + video['Youtube Id'] + '.jpg', () => console.log('done'));
+      // // download thumbnail image
+      // downloadImage(snippet.thumbnails.standard.url,
+      //   './src/images/' + video['Youtube Id'] + '.jpg', () => console.log('done'));
 
       console.log('finished getting video: ' + video['Youtube Id']);
       // after we get the data, call function for next video
-      video = videos.shift();
-      getVideoData(video);
+
+      if (videos.length) {
+        video = videos.shift();
+        getVideoData(video);
+      } else {
+        console.log(videoData);
+        fs.writeFile('./src/data/youtube.json', JSON.stringify(videoData), 'utf-8');
+      }
     });
   });
 }
