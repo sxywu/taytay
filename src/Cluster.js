@@ -8,7 +8,7 @@ const height = 180;
 const margins = {left: 20, right: 20, top: 20, bottom: 20};
 
 const hueScale = d3.scaleLinear().domain([0, 360]).range([margins.left, width - margins.right]);
-const lightnessScale = d3.scaleLinear().range([height - margins.bottom, margins.top]);
+const saturationScale = d3.scaleLinear().range([height - margins.bottom, margins.top]);
 const sizeScale = d3.scaleLinear().range([3, 12]);
 
 class Cluster extends Component {
@@ -30,7 +30,7 @@ class Cluster extends Component {
       color = `rgb(${color})`;
       const [hue, saturation, lightness] = chroma(color).hsl();
       const x = hueScale(hue);
-      const y = lightnessScale(lightness);
+      const y = saturationScale(saturation);
       size = sizeScale(size);
 
       return {color, x, y, size};
