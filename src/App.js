@@ -16,6 +16,15 @@ class App extends Component {
         color: chroma(color.color).hsl(),
       });
     });
+
+    const histoWidth = 600;
+    const histogramStyle = {
+      display: 'inline-block',
+      width: histoWidth,
+      margin: 'auto',
+      textAlign: 'center',
+      padding: 20,
+    };
     const images = _.map(videosData, video => {
       const videoData = require(`./data/${video.id}.json`);
       const videoImage = videoData.frames[Math.floor(videoData.frames.length / 2)]; // take the middle screenshot
@@ -27,19 +36,20 @@ class App extends Component {
         })
         // .filter(color => color.color[2] > 0.1)
         .value();
-
       return (
-        <div>
-          <h3>{video.snippet.title}</h3>
-          <img src={`${process.env.PUBLIC_URL}/images/${video.id}/${videoImage.screenshot}`} />
-          <Histogram colors={colors} />
+        <div style={histogramStyle}>
+          <p><strong>{video.snippet.title}</strong></p>
+          <Histogram colors={colors} width={histoWidth} height={240} />
         </div>
       );
     });
 
     return (
       <div className="App">
-        <Histogram colors={allColors} />
+        <div style={histogramStyle}>
+          <Histogram colors={allColors} width={1200} height={240}/>
+        </div>
+        <br />
         {images}
       </div>
     );

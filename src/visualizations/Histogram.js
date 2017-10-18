@@ -7,12 +7,15 @@ const hue = 0;
 const saturation = 1;
 const lightness = 2;
 
-const width = 600;
-const height = 180;
+const margin = {left: 5, top: 5, right: 5, bottom: 20};
+const hueDivider = 5;
 
 class Histogram extends Component {
 
   componentDidMount() {
+    this.canvas = d3.select(this.refs.container);
+    this.ctx = this.refs.container.getContext('2d');
+
     this.processData(this.props.colors);
     this.renderData();
   }
@@ -23,11 +26,13 @@ class Histogram extends Component {
   }
 
   processData(colors) {
-    this.xScale = d3.scaleLinear().domain([0, 360]).range([0, width]);
-    this.heightScale = d3.scaleLinear().range([0.01, height]);
+    this.xScale = d3.scaleLinear().domain([0, 360])
+      .range([margin.left, this.props.width - margin.right]);
+    this.heightScale = d3.scaleLinear()
+      .range([0, this.props.height - margin.top - margin.bottom]);
 
     this.groups = d3.nest()
-      .key(d => _.floor(d.color[hue], -1))
+      .key(d => _.floor(d.color[hue] * 2, -1) / 2)
       .sortKeys((a, b) => {
         a = parseInt(a);
         b = parseInt(b);
@@ -35,7 +40,7 @@ class Histogram extends Component {
       }).sortValues((a, b) => {
         a = a.color[lightness];
         b = b.color[lightness];
-        return d3.ascending(a, b);
+        return d3.descending(a, b);
       })
       .entries(colors);
 
@@ -51,13 +56,10 @@ class Histogram extends Component {
   }
 
   renderData() {
-    this.canvas = d3.select(this.refs.container);
-    this.ctx = this.refs.container.getContext('2d');
-
-    const colorWidth = this.xScale(10);
+    const colorWidth = this.xScale(hueDivider) - this.xScale(0);
     _.each(this.groups, group => {
       const x = this.xScale(group.hue);
-      let y = height - 1;
+      let y = this.props.height - margin.bottom;
       _.each(group.values, value => {
         const colorHeight = this.heightScale(value.size);
         y -= colorHeight;
@@ -71,14 +73,14 @@ class Histogram extends Component {
         this.ctx.stroke();
       });
 
-      this.ctx.clearRect(x - 1, 0, 1, height);
-      this.ctx.clearRect(x + colorWidth - 0.25, 0, width, height);
+      this.ctx.clearRect(x - 1, 0, 1, this.props.height);
+      this.ctx.clearRect(x + colorWidth - 0.25, 0, this.props.width, this.props.height);
     });
   }
 
   render() {
     return (
-      <canvas ref='container' width={width} height={height} />
+      <canvas ref='container' width={this.props.width} height={this.props.height} />
     );
   }
 }
