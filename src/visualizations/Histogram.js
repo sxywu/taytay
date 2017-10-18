@@ -16,50 +16,30 @@ class Histogram extends Component {
     this.canvas = d3.select(this.refs.container);
     this.ctx = this.refs.container.getContext('2d');
 
-    this.processData(this.props.colors);
+    this.processData();
     this.renderData();
     this.renderLegend();
   }
 
   componentDidUpdate() {
-    this.processData(this.props.colors);
+    this.processData();
     this.renderData();
     this.renderLegend();
   }
 
-  processData(colors) {
+  processData() {
     this.xScale = d3.scaleLinear().domain([0, 360])
       .range([margin.left, this.props.width - margin.right]);
     this.heightScale = d3.scaleLinear()
       .range([0, this.props.height - margin.top - margin.bottom]);
 
-    this.groups = d3.nest()
-      .key(d => _.floor(d.color[hue] * 2, -1) / 2)
-      .sortKeys((a, b) => {
-        a = parseInt(a);
-        b = parseInt(b);
-        return d3.ascending(a, b);
-      }).sortValues((a, b) => {
-        a = a.color[lightness];
-        b = b.color[lightness];
-        return d3.descending(a, b);
-      })
-      .entries(colors);
-
-    _.each(this.groups, group => {
-      Object.assign(group, {
-        hue: parseInt(group.key),
-        sum: _.sumBy(group.values, value => value.size),
-      });
-    });
-
-    const sumMax = d3.max(this.groups, d => d.sum);
+    const sumMax = d3.max(this.props.groups, d => d.sum);
     this.heightScale.domain([1, sumMax]);
   }
 
   renderData() {
     const colorWidth = this.xScale(hueDivider) - this.xScale(0);
-    _.each(this.groups, group => {
+    _.each(this.props.groups, group => {
       const x = this.xScale(group.hue);
       let y = this.props.height - margin.bottom;
       _.each(group.values, value => {
@@ -85,7 +65,7 @@ class Histogram extends Component {
     const y = this.props.height - 1 * margin.bottom + 2;
     const colorWidth = this.xScale(hueDivider) - this.xScale(0);
     const colorHeight = 0.75 * colorWidth;
-    _.each(this.groups, group => {
+    _.each(this.props.groups, group => {
       const color = chroma(group.hue, 0.75, 0.5, 'hsl');
       const x = this.xScale(group.hue);
 
