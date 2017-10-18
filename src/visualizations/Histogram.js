@@ -9,12 +9,14 @@ const lightness = 2;
 
 const width = 600;
 const height = 180;
-const xScale = d3.scaleLinear().domain([0, 360]).range([0, width]);
-const heightScale = d3.scaleLinear().range([0.01, height]);
 
 class Histogram extends Component {
 
   componentWillMount() {
+
+    this.xScale = d3.scaleLinear().domain([0, 360]).range([0, width]);
+    this.heightScale = d3.scaleLinear().range([0.01, height]);
+
     this.groups = d3.nest()
       .key(d => _.floor(d.color[hue], -1))
       .sortKeys((a, b) => {
@@ -36,19 +38,19 @@ class Histogram extends Component {
     });
 
     const sumMax = d3.max(this.groups, d => d.sum);
-    heightScale.domain([1, sumMax]);
+    this.heightScale.domain([1, sumMax]);
   }
 
   componentDidMount() {
     this.canvas = d3.select(this.refs.container);
     this.ctx = this.refs.container.getContext('2d');
 
-    const colorWidth = xScale(10);
+    const colorWidth = this.xScale(10);
     _.each(this.groups, group => {
-      const x = xScale(group.hue);
+      const x = this.xScale(group.hue);
       let y = height - 1;
       _.each(group.values, value => {
-        const colorHeight = heightScale(value.size);
+        const colorHeight = this.heightScale(value.size);
         y -= colorHeight;
 
         this.ctx.beginPath();
