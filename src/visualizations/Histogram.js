@@ -52,11 +52,18 @@ class Histogram extends Component {
       _.each(group.values, value => {
         const colorHeight = this.heightScale(value.size);
         y -= colorHeight;
+        const color = chroma(value.color[0], value.color[1], value.color[2], 'hsl');
 
         this.ctx.beginPath();
-        this.ctx.fillStyle = chroma(value.color[0], value.color[1], value.color[2], 'hsl');
-        this.ctx.fillRect(x, y, colorWidth, colorHeight);
+        this.ctx.fillStyle = color;
+        this.ctx.strokeStyle = color;
+        this.ctx.rect(x, y, colorWidth, colorHeight);
+        this.ctx.fill();
+        this.ctx.stroke();
       });
+
+      this.ctx.clearRect(x - 1, 0, 1, height);
+      this.ctx.clearRect(x + colorWidth - 0.25, 0, width, height);
     });
   }
 
