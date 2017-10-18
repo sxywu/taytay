@@ -12,8 +12,17 @@ const height = 180;
 
 class Histogram extends Component {
 
-  componentWillMount() {
+  componentDidMount() {
+    this.processData(this.props.colors);
+    this.renderData();
+  }
 
+  componentDidUpdate() {
+    this.processData(this.props.colors);
+    this.renderData();
+  }
+
+  processData(colors) {
     this.xScale = d3.scaleLinear().domain([0, 360]).range([0, width]);
     this.heightScale = d3.scaleLinear().range([0.01, height]);
 
@@ -28,7 +37,7 @@ class Histogram extends Component {
         b = b.color[lightness];
         return d3.ascending(a, b);
       })
-      .entries(this.props.colors);
+      .entries(colors);
 
     _.each(this.groups, group => {
       Object.assign(group, {
@@ -41,7 +50,7 @@ class Histogram extends Component {
     this.heightScale.domain([1, sumMax]);
   }
 
-  componentDidMount() {
+  renderData() {
     this.canvas = d3.select(this.refs.container);
     this.ctx = this.refs.container.getContext('2d');
 
