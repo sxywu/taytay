@@ -5,13 +5,16 @@ const clusterfck = require('clusterfck');
 
 let videosData = fs.readFileSync('./data/mv.json');
 videosData = JSON.parse(videosData);
+const hasBorder = ["QUwxKWT6m7U", "nN6VR92V70M", "RzhAS_GnJIc", "cMPEd8m79Hw", "vNoKguSdy4Y",
+  "QuijXg8wm28", "e-ORhEE9VVg", "QcIy9NiNbmo", "IdneKLhsWOQ", "JLf9q36UsBk", "7F37r50VUTQ", "3tmd-ClpJxA"];
 
+const frameHeight = 25;
 let videoId;
 let videoFile;
 let videoData;
 let index = 0; // keeping track of which screenshot we're at
 function getColorsForImage(image) {
-  console.log(`\t${index}: ${JSON.stringify(image)}`);
+  console.log(`\timage: ${index}`);
   if (index === videoData.length) {
     // if we've gone through all the images for video then go to next video
     if (videosData.length) {
@@ -25,12 +28,17 @@ function getColorsForImage(image) {
     if (err) return console.log(err);
 
     const [imageWidth, imageHeight, channels] = pixels.shape.slice();
-    const imageData = pixels.data;
+    const shaveOff = imageWidth * frameHeight * 4;
+
+    let imageData = pixels.data;
+    if (_.includes(hasBorder, videoId)) {
+      imageData = _.chain(pixels.data).dropRight(shaveOff).drop(shaveOff).value();
+    }
     const colors = [];
 
     // get the colors
     for (let x = 0; x < imageWidth; x += 5) {
-      for (let y = 0; y < imageHeight; y += 5) {
+      for (let y = 0; y < (imageHeight - 2 * frameHeight); y += 5) {
         let offset = x * 4 + y * 4 * imageWidth;
         let color = [imageData[offset + 0], imageData[offset + 1], imageData[offset + 2]];
         if (color.join(',') !== '0,0,0') {
@@ -57,7 +65,7 @@ function getColorsForImage(image) {
     // after getting cluster size and color, save it to image json
     image.colors = clusters;
     // save it to file
-    fs.writeFileSync(videoFile, JSON.stringify(videoData));
+    fs.writeFileSync(videoFile, JSON.stringify({frames: videoData}));
     // go to next image
     index += 1;
     getColorsForImage(videoData[index]);
@@ -78,12 +86,12 @@ function processVideo(video) {
   videoFile = `./src/data/${videoId}.json`;
   videoData = fs.readFileSync(videoFile, 'utf-8');
   videoData = JSON.parse(videoData);
+  videoData = videoData.frames;
   index = 0;
 
   console.log(videoId, videoFile, videoData.length, index);
   getColorsForImage(videoData[index]);
 }
 
-videosData = videosData.slice(10)
 let video = videosData.shift();
 processVideo(video);
