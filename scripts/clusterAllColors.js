@@ -12,7 +12,7 @@ function processVideoColors(video) {
   const videoFile = `./src/data/${videoId}.json`;
   let videoData = fs.readFileSync(videoFile, 'utf-8');
   videoData = JSON.parse(videoData);
-  // videoData = videoData.frames;
+  videoData = videoData.frames;
 
   let colors = {};
   const clusterSizes = {};
@@ -47,11 +47,11 @@ function processVideoColors(video) {
     video = videosData.shift();
     processVideoColors(video);
   } else {
-    // // and if it's done, then do same cluster analysis
-    // console.log('all videos', allColors.length, _.size(allClusterSizes));
-    // allColors = _.values(allColors);
-    // const allClusters = clusterColors(allColors, allClusterSizes);
-    // fs.writeFileSync('./src/data/allColors.json', JSON.stringify(allClusters));
+    // and if it's done, then do same cluster analysis
+    console.log('all videos', allColors.length, _.size(allClusterSizes));
+    allColors = _.values(allColors);
+    const allClusters = clusterColors(allColors, allClusterSizes);
+    fs.writeFileSync('./src/data/allColors.json', JSON.stringify(allClusters));
   }
 }
 
