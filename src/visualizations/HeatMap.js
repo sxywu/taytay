@@ -16,6 +16,7 @@ class HeatMap extends Component {
     this.opacityScale = d3.scaleLinear().range([1, 100]);
 
     this.renderData();
+    this.props.border && this.renderBorders();
   }
 
   renderData() {
@@ -34,11 +35,26 @@ class HeatMap extends Component {
 
         this.ctx.beginPath();
         this.ctx.fillStyle = color;
-        this.ctx.strokeStyle = color;
         this.ctx.rect(x, y, colorWidth, colorHeight);
         this.ctx.fill();
-        this.ctx.stroke();
       });
+    });
+  }
+
+  renderBorders() {
+    const colorWidth = this.xScale(hueDivider) - this.xScale(0);
+    const colorHeight = (this.props.height - margin.top - margin.bottom) / this.props.data.length;
+    this.ctx.fillStyle = '#fcfcfc';
+
+    _.times(this.props.data.length + 1, i => {
+      const y = i * colorHeight + margin.top;
+      this.ctx.clearRect(margin.left, y, this.props.width - margin.left - margin.right, 1);
+      this.ctx.fillRect(margin.left, y, this.props.width - margin.left - margin.right, 1);
+    });
+    _.times(360 / hueDivider + 1, i => {
+      const x = this.xScale(i * hueDivider);
+      this.ctx.clearRect(x, margin.top, 1, this.props.height - margin.top - margin.bottom);
+      this.ctx.fillRect(x, margin.top, 1, this.props.height - margin.top - margin.bottom);
     });
   }
 

@@ -108,7 +108,7 @@ class App extends Component {
 
     return (
       <div className="App">
-        <HeatMap data={heatMapData} width={2 * histoWidth} height={2 * histoHeight} />
+        <HeatMap data={heatMapData} border={true} width={2 * histoWidth} height={2 * histoHeight} />
         {videos}
       </div>
     );
