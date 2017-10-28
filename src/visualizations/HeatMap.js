@@ -4,7 +4,7 @@ import _ from 'lodash';
 import chroma from 'chroma-js';
 
 const hueDivider = 5;
-const margin = {left: 20, top: 20, right: 20, bottom: 20};
+const margin = {left: 5, top: 5, right: 5, bottom: 5};
 
 class HeatMap extends Component {
   componentDidMount() {
@@ -28,7 +28,7 @@ class HeatMap extends Component {
 
       _.each(row, column => {
         const opacity = this.opacityScale(column.sum) / 100;
-        let color = chroma(column.hue, 1, 0.5, 'hsl').alpha(opacity).rgba();
+        let color = chroma(column.hue, 0.75, 0.5, 'hsl').alpha(opacity).rgba();
         color = `rgba(${color})`;
         const x = this.xScale(column.hue);
 
