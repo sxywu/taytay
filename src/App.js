@@ -4,7 +4,7 @@ import _ from 'lodash';
 import chroma from 'chroma-js';
 
 import Histogram from './visualizations/Histogram';
-import LineChart from './visualizations/LineChart';
+import HeatMap from './visualizations/HeatMap';
 
 const hue = 0;
 const saturation = 1;
@@ -20,7 +20,7 @@ class App extends Component {
   }
 
   calculateData() {
-    this.colorsForVideos = _.map(videosData, video => {
+    _.each(videosData, video => {
       _.each(video.colors, color => {
         Object.assign(color, {color: chroma(color.color).hsl()});
       });
@@ -57,12 +57,13 @@ class App extends Component {
         });
       });
 
-      return Object.assign(video, {groupByHue, groupByLightness});
+      Object.assign(video, {groupByHue, groupByLightness});
     });
   }
 
   render() {
-    const histoWidth = 600;
+    const histoWidth = 360;
+    const histoHeight = 120;
     const histogramStyle = {
       display: 'inline-block',
       width: histoWidth,
@@ -71,33 +72,21 @@ class App extends Component {
       padding: 20,
     };
 
-    const lineChartData = _.map(videosData, video => {
-      // const data = _.times(1 / 0.025, i => {
-      //   const key = `${_.round(i * 0.025, 3)}`;
-      //   const hue = _.find(video.groupByLightness, d => d.key === key);
-      //   return hue ? {key: hue.key, sum: hue.sum} : {key, sum: 0};
-      // });
-      const data = _.times(360 / 5, i => {
-        const key = `${i * 5}`;
-        const hue = _.find(video.groupByHue, d => d.key === key);
-        return hue ? {key: hue.key, sum: hue.sum} : {key, sum: 0};
-      });
-      return {data, id: video.id, date: new Date(video.snippet.publishedAt)};
-    });
-    console.log(lineChartData);
+    console.log(videosData);
 
     const videos = _.map(videosData, video => {
       return (
         <div style={histogramStyle}>
           <p><strong>{video.snippet.title}</strong></p>
-          <Histogram groups={video.groupByHue} width={histoWidth} height={240} />
+          <Histogram groups={video.groupByHue} width={histoWidth} height={histoHeight} />
         </div>
       );
     });
+    const heatMapData = _.map(videosData, 'groupByHue');
 
     return (
       <div className="App">
-        <LineChart lines={lineChartData} width={2 * histoWidth} height={480} />
+        <HeatMap data={heatMapData} width={2 * histoWidth} height={2 * histoHeight} />
         {videos}
       </div>
     );
