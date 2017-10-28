@@ -4,7 +4,7 @@ import _ from 'lodash';
 import chroma from 'chroma-js';
 
 const hueDivider = 5;
-const margin = {left: 5, top: 5, right: 5, bottom: 20};
+const margin = {left: 20, top: 20, right: 20, bottom: 20};
 
 class HeatMap extends Component {
   componentDidMount() {
@@ -15,25 +15,20 @@ class HeatMap extends Component {
       .range([margin.left, this.props.width - margin.right]);
     this.opacityScale = d3.scaleLinear().range([1, 100]);
 
-    this.processData();
     this.renderData();
-  }
-
-  processData() {
-    this.xScale.range([margin.left, this.props.width - margin.right]);
-
-    const sumMax = _.chain(this.props.data).flatten().map('sum').max().value();
-    this.opacityScale.domain([1, sumMax]);
   }
 
   renderData() {
     const colorWidth = this.xScale(hueDivider) - this.xScale(0);
-    const colorHeight = this.props.height / this.props.data.length;
+    const colorHeight = (this.props.height - margin.top - margin.bottom) / this.props.data.length;
     _.each(this.props.data, (row, i) => {
-      const y = i * colorHeight;
+      const y = i * colorHeight + margin.top;
+      const maxSum = d3.max(row, d => d.sum);
+      this.opacityScale.domain([1, maxSum]);
+
       _.each(row, column => {
         const opacity = this.opacityScale(column.sum) / 100;
-        let color = chroma(column.hue, 0.75, 0.5, 'hsl').alpha(opacity).rgba();
+        let color = chroma(column.hue, 1, 0.5, 'hsl').alpha(opacity).rgba();
         color = `rgba(${color})`;
         const x = this.xScale(column.hue);
 
