@@ -16,6 +16,9 @@ class Histogram extends Component {
     this.canvas = d3.select(this.refs.container);
     this.ctx = this.refs.container.getContext('2d');
 
+    this.xScale = d3.scaleLinear().domain([0, 360]);
+    this.heightScale = d3.scaleLinear();
+
     this.processData();
     this.renderData();
     this.renderLegend();
@@ -28,13 +31,11 @@ class Histogram extends Component {
   }
 
   processData() {
-    this.xScale = d3.scaleLinear().domain([0, 360])
-      .range([margin.left, this.props.width - margin.right]);
-    this.heightScale = d3.scaleLinear()
-      .range([0, this.props.height - margin.top - margin.bottom]);
+    this.xScale.range([margin.left, this.props.width - margin.right]);
 
     const sumMax = d3.max(this.props.groups, d => d.sum);
-    this.heightScale.domain([1, sumMax]);
+    this.heightScale.domain([0, sumMax])
+      .range([0, this.props.height - margin.top - margin.bottom]);
   }
 
   renderData() {
