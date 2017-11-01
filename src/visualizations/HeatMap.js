@@ -14,7 +14,7 @@ class HeatMap extends Component {
     this.opacityScale = d3.scaleLinear().range([10, 100]);
 
     this.renderData();
-    this.props.border && this.renderBorders();
+    this.renderBorders();
   }
 
   renderData() {
@@ -47,11 +47,6 @@ class HeatMap extends Component {
       const y = i * colorHeight + margin.top;
       this.ctx.clearRect(margin.left, y, this.props.width - margin.left - margin.right, 1);
       this.ctx.fillRect(margin.left, y, this.props.width - margin.left - margin.right, 1);
-    });
-    _.times(this.props.numBlocks + 1, i => {
-      const x = i * this.colorWidth + margin.left;
-      this.ctx.clearRect(x, margin.top, 1, this.props.height - margin.top - margin.bottom);
-      this.ctx.fillRect(x, margin.top, 1, this.props.height - margin.top - margin.bottom);
     });
   }
 

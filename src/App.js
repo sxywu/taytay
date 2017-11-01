@@ -130,7 +130,7 @@ class App extends Component {
     };
 
     const videos = _.map(videosData, video => {
-      const heatMapHeight = video.frames.length * 4;
+      const heatMapHeight = video.frames.length * 8;
       return (
         <div style={histogramStyle}>
           <p><strong>{video.title}</strong></p>
