@@ -4,7 +4,7 @@ const vttToJson = require('vtt-to-json');
 const ffmpeg = require('fluent-ffmpeg');
 const getDuration = require('get-video-duration');
 
-let videosData = fs.readFileSync('./data/mv.json', 'utf-8');
+let videosData = fs.readFileSync('./src/data/metadata.json', 'utf-8');
 videosData = JSON.parse(videosData);
 
 function takeScreenshotForVideo(videoId, captions) {

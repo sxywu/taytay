@@ -2,7 +2,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const clusterfck = require('clusterfck');
 
-let videosData = fs.readFileSync('./data/mv.json', 'utf-8');
+let videosData = fs.readFileSync('./src/data/metadata.json', 'utf-8');
 videosData = JSON.parse(videosData);
 let allColors = {};
 const allClusterSizes = {};

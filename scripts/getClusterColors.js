@@ -3,7 +3,7 @@ const _ = require('lodash');
 const getPixels = require('get-pixels');
 const clusterfck = require('clusterfck');
 
-let videosData = fs.readFileSync('./data/mv.json');
+let videosData = fs.readFileSync('./src/data/metadata.json');
 videosData = JSON.parse(videosData);
 const hasBorder = ["QUwxKWT6m7U", "nN6VR92V70M", "RzhAS_GnJIc", "cMPEd8m79Hw", "vNoKguSdy4Y",
   "QuijXg8wm28", "e-ORhEE9VVg", "QcIy9NiNbmo", "IdneKLhsWOQ", "JLf9q36UsBk", "7F37r50VUTQ", "3tmd-ClpJxA", "wIft-t-MQuE"];
@@ -93,5 +93,7 @@ function processVideo(video) {
   getColorsForImage(videoData[index]);
 }
 
+// const withSubtitles = ['3tmd-ClpJxA', '7F37r50VUTQ', 'VuNIsY6JdUw', 'wIft-t-MQuE', 'wyK7YuwUWsU'];
+// videosData = _.filter(videosData, video => _.includes(withSubtitles, video['Youtube Id']));
 let video = videosData.shift();
 processVideo(video);
