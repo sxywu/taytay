@@ -6,7 +6,7 @@ const clusterfck = require('clusterfck');
 let videosData = fs.readFileSync('./data/mv.json');
 videosData = JSON.parse(videosData);
 const hasBorder = ["QUwxKWT6m7U", "nN6VR92V70M", "RzhAS_GnJIc", "cMPEd8m79Hw", "vNoKguSdy4Y",
-  "QuijXg8wm28", "e-ORhEE9VVg", "QcIy9NiNbmo", "IdneKLhsWOQ", "JLf9q36UsBk", "7F37r50VUTQ", "3tmd-ClpJxA"];
+  "QuijXg8wm28", "e-ORhEE9VVg", "QcIy9NiNbmo", "IdneKLhsWOQ", "JLf9q36UsBk", "7F37r50VUTQ", "3tmd-ClpJxA", "wIft-t-MQuE"];
 
 const frameHeight = 25;
 let videoId;
