@@ -34,11 +34,9 @@ class HeatMap extends Component {
 
       _.each(row, column => {
         const opacity = this.opacityScale(column.sum) / 100;
-        let color = chroma(column.hue, 0.75, 0.5, 'hsl').alpha(opacity).rgba();
-        if (!this.props.hue) {
-          color = chroma(200, 1, 0.25, 'hsl').alpha(opacity).rgba();
-        }
-        color = `rgba(${color})`;
+        let color = _.maxBy(column.values, value => value.size);
+        color = chroma(color.color[0], color.color[1], color.color[2], 'hsl');
+        // color = `rgba(${color.alpha(opacity).rgba()})`;
 
         let x = this.xScale(column.hue);
         if (!this.props.hue) {
