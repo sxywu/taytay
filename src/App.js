@@ -34,8 +34,7 @@ function groupByHue(colors) {
       a = a.color[lightness];
       b = b.color[lightness];
       return d3.descending(a, b);
-    })
-    .entries(colors);
+    }).entries(colors);
   _.each(groupByHue, group => {
     Object.assign(group, {
       key: parseInt(group.key),
@@ -49,15 +48,17 @@ function groupByHue(colors) {
 
 function groupByLightness(colors) {
   const groupByLightness = d3.nest()
-    .key(d => _.round(_.floor(d.color[lightness] / 0.025) * 0.025, 3))
+    .key(d => _.floor(d.color[lightness] / 0.025))
     .sortKeys((a, b) => {
       a = parseFloat(a);
       b = parseFloat(b);
       return d3.ascending(a, b);
-    }).entries(colors);
+    }).sortValues((a, b) => d3.ascending(a.color[hue], b.color[hue]))
+    .entries(colors);
   _.each(groupByLightness, group => {
     Object.assign(group, {
-      lightness: parseFloat(group.key),
+      key: parseInt(group.key),
+      lightness: _.floor(group.values[0].color[lightness] / 0.025) * 0.025,
       sum: _.sumBy(group.values, value => value.size),
     });
   });
