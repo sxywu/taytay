@@ -11,16 +11,17 @@ const saturation = 1;
 const lightness = 2;
 
 const videosMetadata = require('./data/metadata.json');
-const videosData = _.map(require('./data/youtube.json'), video => {
-  const metadata = _.find(videosMetadata, meta => meta['Youtube Id'] === video.id);
-  return Object.assign(video, require(`./data/${video.id}.json`), {
-    title: metadata.Title,
-    bpm: metadata.BPM,
-    year: metadata.Year,
-    director: metadata.Director,
-    album: metadata.Album,
-  });
-});
+const videosData = _.chain(require('./data/youtube.json'))
+  .map(video => {
+    const metadata = _.find(videosMetadata, meta => meta['Youtube Id'] === video.id);
+    return Object.assign(video, require(`./data/${video.id}.json`), {
+      title: metadata.Title,
+      bpm: metadata.BPM,
+      year: metadata.Year,
+      director: metadata.Director,
+      album: metadata.Album,
+    });
+  }).filter(video => video.album).value();
 
 function groupByHue(colors) {
   const groupByHue = d3.nest()
@@ -132,41 +133,52 @@ class App extends Component {
       return (
         <div style={histogramStyle}>
           <p><strong>{video.title}</strong></p>
-          <Histogram groups={video.groupByHue} numBlocks={72}width={histoWidth} height={histoHeight} />
+          <Histogram groups={video.groupByHue} numBlocks={72} legend={true}
+            width={histoWidth} height={histoHeight} />
           <HeatMap data={_.map(video.frames, 'groupByHue')} numBlocks={72}
             width={histoWidth} height={heatMapHeight} />
         </div>
       );
     });
-    const heatmaps = _.chain(videosData)
+
+    const summaryWidth = 360;
+    const summaryStyle = {
+      position: 'relative',
+      width: summaryWidth,
+      display: 'inline-block',
+      verticalAlign: 'top',
+      padding: 20,
+    }
+    const nameStyle = {
+      fontSize: 10,
+      position: 'absolute',
+      width: summaryWidth,
+      textAlign: 'center',
+    };
+    const summary = _.chain(videosData)
       .groupBy(video => video.album)
       .sortBy(videos => videos[0].year)
       .map((videos) => {
-        const nameHeight = (14 * videos.length - 10) / videos.length;
-        const videoNames = _.map(videos, d => <div style={{height: nameHeight}}>{d.title}</div>);
-        const nameStyle = {
-          width: 240,
-          textAlign: 'right',
-          padding: 5,
-          fontSize: 10,
-          display: 'inline-block',
-          verticalAlign: 'top',
-        }
-        return (
-          <div style={{position: 'relative'}}>
-            <div style={{marginLeft: 255}}>{videos[0].album}</div>
-            <div style={nameStyle}>
-              {videoNames}
+        const histograms = _.map(videos, video => {
+          return (
+            <div style={{position: 'relative'}}>
+              <div style={nameStyle}>{video.title}</div>
+              <Histogram groups={video.groupByHue} numBlocks={72}
+                width={summaryWidth} height={36} />
             </div>
-            <HeatMap data={_.map(videos, 'groupByHue')} numBlocks={72}
-              border={true} width={6 * 80} height={14 * videos.length} />
+          );
+        });
+        return (
+          <div style={summaryStyle}>
+            <h4 style={{textAlign: 'center'}}>{videos[0].album}</h4>
+            {histograms}
           </div>
         )
       }).value();
 
     return (
       <div className="App">
-        {heatmaps}
+        {summary}
         {videos}
       </div>
     );

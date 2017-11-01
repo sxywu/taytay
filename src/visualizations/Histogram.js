@@ -18,27 +18,32 @@ class Histogram extends Component {
 
     this.processData();
     this.renderData();
-    this.renderLegend();
+    this.props.legend && this.renderLegend();
+    this.renderLine();
   }
 
   componentDidUpdate() {
     this.processData();
     this.renderData();
-    this.renderLegend();
+    this.props.legend && this.renderLegend();
+    this.renderLine();
   }
 
   processData() {
     this.colorWidth = (this.props.width - margin.left - margin.right) / this.props.numBlocks;
 
     const sumMax = d3.max(this.props.groups, d => d.sum);
-    this.heightScale.domain([0, sumMax])
-      .range([0, this.props.height - margin.top - margin.bottom]);
+    let heightMax = this.props.height - margin.top;
+    if (this.props.legend) {
+      heightMax = heightMax - margin.top - margin.bottom;
+    }
+    this.heightScale.domain([0, sumMax]).range([0, heightMax]);
   }
 
   renderData() {
     _.each(this.props.groups, group => {
       const x = group.key * this.colorWidth + margin.left;
-      let y = this.props.height - margin.bottom;
+      let y = this.props.height - (this.props.legend ? margin.bottom : 0);
       _.each(group.values, value => {
         const colorHeight = this.heightScale(value.size);
         y -= colorHeight;
@@ -73,11 +78,13 @@ class Histogram extends Component {
       this.ctx.clearRect(x - 1, y, 1, colorHeight);
       this.ctx.clearRect(x + this.colorWidth - 0.25, y, this.props.width, colorHeight);
     });
+  }
 
+  renderLine() {
     // draw line under chart
     this.ctx.beginPath();
-    this.ctx.fillStyle = '#000';
-    this.ctx.fillRect(margin.left, this.props.height - margin.bottom,
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+    this.ctx.fillRect(margin.left, this.props.height - (this.props.legend ? margin.bottom : 1),
       this.props.width - margin.left - margin.right, 1);
   }
 
