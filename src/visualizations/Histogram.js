@@ -8,15 +8,13 @@ const saturation = 1;
 const lightness = 2;
 
 const margin = {left: 5, top: 5, right: 5, bottom: 20};
-const hueDivider = 5;
+const numBlocks = 80;
 
 class Histogram extends Component {
 
   componentDidMount() {
     this.canvas = d3.select(this.refs.container);
     this.ctx = this.refs.container.getContext('2d');
-
-    this.xScale = d3.scaleLinear().domain([0, 360]);
     this.heightScale = d3.scaleLinear();
 
     this.processData();
@@ -31,7 +29,7 @@ class Histogram extends Component {
   }
 
   processData() {
-    this.xScale.range([margin.left, this.props.width - margin.right]);
+    this.colorWidth = (this.props.width - margin.left - margin.right) / numBlocks;
 
     const sumMax = d3.max(this.props.groups, d => d.sum);
     this.heightScale.domain([0, sumMax])
@@ -39,9 +37,8 @@ class Histogram extends Component {
   }
 
   renderData() {
-    const colorWidth = this.xScale(hueDivider) - this.xScale(0);
     _.each(this.props.groups, group => {
-      const x = this.xScale(group.hue);
+      const x = group.key * this.colorWidth + margin.left;
       let y = this.props.height - margin.bottom;
       _.each(group.values, value => {
         const colorHeight = this.heightScale(value.size);
@@ -51,32 +48,31 @@ class Histogram extends Component {
         this.ctx.beginPath();
         this.ctx.fillStyle = color;
         this.ctx.strokeStyle = color;
-        this.ctx.rect(x, y, colorWidth, colorHeight);
+        this.ctx.rect(x, y, this.colorWidth, colorHeight);
         this.ctx.fill();
         this.ctx.stroke();
       });
 
       this.ctx.clearRect(x - 1, 0, 1, this.props.height);
-      this.ctx.clearRect(x + colorWidth - 0.25, 0, this.props.width, this.props.height);
+      this.ctx.clearRect(x + this.colorWidth - 0.25, 0, this.props.width, this.props.height);
     });
   }
 
   renderLegend() {
     // color legend under chart
     const y = this.props.height - 1 * margin.bottom + 2;
-    const colorWidth = this.xScale(hueDivider) - this.xScale(0);
-    const colorHeight = 0.75 * colorWidth;
+    const colorHeight = 0.75 * this.colorWidth;
     _.each(this.props.groups, group => {
-      const color = chroma(group.hue, 0.75, 0.5, 'hsl');
-      const x = this.xScale(group.hue);
+      const color = chroma(group.hue, 0.75, group.lightness, 'hsl');
+      const x = group.key * this.colorWidth + margin.left;
 
       this.ctx.beginPath();
       this.ctx.fillStyle = color;
-      this.ctx.rect(x, y, colorWidth, colorHeight);
+      this.ctx.rect(x, y, this.colorWidth, colorHeight);
       this.ctx.fill();
 
       this.ctx.clearRect(x - 1, y, 1, colorHeight);
-      this.ctx.clearRect(x + colorWidth - 0.25, y, this.props.width, colorHeight);
+      this.ctx.clearRect(x + this.colorWidth - 0.25, y, this.props.width, colorHeight);
     });
 
     // draw line under chart

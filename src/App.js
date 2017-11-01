@@ -24,7 +24,7 @@ const videosData = _.map(require('./data/youtube.json'), video => {
 
 function groupByHue(colors) {
   const groupByHue = d3.nest()
-    .key(d => _.floor(d.color[hue] * 2, -1) / 2)
+    .key(d => _.floor(d.color[hue] / 5) * 5)
     .sortKeys((a, b) => {
       a = parseInt(a);
       b = parseInt(b);
@@ -47,7 +47,7 @@ function groupByHue(colors) {
 
 function groupByLightness(colors) {
   const groupByLightness = d3.nest()
-    .key(d => _.round(Math.floor(d.color[lightness] / 0.025) * 0.025, 3))
+    .key(d => _.round(_.floor(d.color[lightness] / 0.025) * 0.025, 3))
     .sortKeys((a, b) => {
       a = parseFloat(a);
       b = parseFloat(b);
@@ -61,6 +61,35 @@ function groupByLightness(colors) {
   });
 
   return groupByLightness;
+}
+
+function groupByHueLightness(colors) {
+  const groupByHueLightness = d3.nest()
+    .key(d => _.floor(d.color[hue] / 45) * 10 + _.floor(d.color[lightness], 1) * 10)
+    .sortKeys((a, b) => {
+      a = parseFloat(a);
+      b = parseFloat(b);
+      return d3.ascending(a, b);
+      // const [aH, aL] = _.map(a.split('-'), parseFloat);
+      // const [bH, bL] = _.map(b.split('-'), parseFloat);
+      // if (aH === bH) {
+      //   return d3.descending(aL, bL);
+      // }
+      // return d3.ascending(aH, bH);
+    }).sortValues((a, b) => {
+      a = a.color[saturation];
+      b = b.color[saturation];
+      return d3.descending(a, b);
+    }).entries(colors);
+  _.each(groupByHueLightness, group => {
+    Object.assign(group, {
+      key: parseInt(group.key),
+      hue: _.floor(group.values[0].color[hue] / 45) * 45,
+      lightness: _.floor(group.values[0].color[lightness], 1),
+      sum: _.sumBy(group.values, value => value.size),
+    });
+  });
+  return groupByHueLightness;
 }
 
 class App extends Component {
@@ -78,13 +107,15 @@ class App extends Component {
           Object.assign(color, {color: chroma(color.color).hsl()});
         });
         Object.assign(frame, {
-          groupByHue: groupByHue(frame.colors),
+          // groupByHue: groupByHue(frame.colors),
+          groupByHueLightness: groupByHueLightness(frame.colors),
         });
       });
 
       Object.assign(video, {
-        groupByHue: groupByHue(video.colors),
-        groupByLightness: groupByLightness(video.colors),
+        // groupByHue: groupByHue(video.colors),
+        // groupByLightness: groupByLightness(video.colors),
+        groupByHueLightness: groupByHueLightness(video.colors),
       });
     });
   }
@@ -102,13 +133,13 @@ class App extends Component {
     };
 
     const videos = _.map(videosData, video => {
-      const heatMapData = _.map(video.frames, 'groupByHue');
+      const heatMapData = _.map(video.frames, 'groupByHueLightness');
       const heatMapHeight = video.frames.length * 8;
       return (
         <div style={histogramStyle}>
           <p><strong>{video.snippet.title}</strong></p>
-          <Histogram groups={video.groupByHue} width={histoWidth} height={histoHeight} />
-          <HeatMap data={heatMapData} border={true} hue={true} width={histoWidth} height={heatMapHeight} />
+          <Histogram groups={video.groupByHueLightness} width={histoWidth} height={histoHeight} />
+          <HeatMap data={heatMapData} border={true} width={histoWidth} height={heatMapHeight} />
         </div>
       );
     });
@@ -116,7 +147,6 @@ class App extends Component {
       .groupBy(video => video.album)
       .sortBy(videos => videos[0].year)
       .map((videos) => {
-        const hueData = _.map(videos, 'groupByHue');
         const nameHeight = (14 * videos.length - 10) / videos.length;
         const videoNames = _.map(videos, d => <div style={{height: nameHeight}}>{d.title}</div>);
         const nameStyle = {
@@ -133,7 +163,8 @@ class App extends Component {
             <div style={nameStyle}>
               {videoNames}
             </div>
-            <HeatMap data={hueData} hue={true} border={true} width={6 * 72} height={14 * videos.length} />
+            <HeatMap data={_.map(videos, 'groupByHueLightness')}
+              border={true} width={6 * 80} height={14 * videos.length} />
           </div>
         )
       }).value();
