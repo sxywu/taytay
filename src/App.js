@@ -4,7 +4,7 @@ import _ from 'lodash';
 import chroma from 'chroma-js';
 
 import Histogram from './visualizations/Histogram';
-import HeatMap from './visualizations/HeatMap';
+import Video from './Video';
 
 const hue = 0;
 const saturation = 1;
@@ -120,27 +120,9 @@ class App extends Component {
   render() {
     const histoWidth = 480;
     const histoHeight = 240;
-    const histogramStyle = {
-      display: 'inline-block',
-      width: histoWidth,
-      margin: 'auto',
-      textAlign: 'center',
-      padding: 20,
-      verticalAlign: 'top',
-    };
 
-    const videos = _.map(videosData, video => {
-      const heatMapHeight = video.frames.length * 8;
-      return (
-        <div style={histogramStyle}>
-          <p><strong>{video.title}</strong></p>
-          <Histogram groups={video.groupByHue} numBlocks={72} legend={true}
-            width={histoWidth} height={histoHeight} />
-          <HeatMap data={_.map(video.frames, 'groupByHue')} numBlocks={72}
-            width={histoWidth} height={heatMapHeight} />
-        </div>
-      );
-    });
+    const videos = _.map(videosData, video =>
+      <Video data={video} width={histoWidth} height={histoHeight} />);
 
     const summaryWidth = 360;
     const summaryStyle = {
@@ -165,7 +147,7 @@ class App extends Component {
             <div style={{position: 'relative'}}>
               <div style={nameStyle}>{video.title}</div>
               <Histogram groups={video.groupByHue} numBlocks={72}
-                width={summaryWidth} height={36} />
+                width={summaryWidth} height={50} />
             </div>
           );
         });
