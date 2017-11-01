@@ -10,8 +10,16 @@ const hue = 0;
 const saturation = 1;
 const lightness = 2;
 
+const videosMetadata = require('./data/metadata.json');
 const videosData = _.map(require('./data/youtube.json'), video => {
-  return Object.assign(video, require(`./data/${video.id}.json`));
+  const metadata = _.find(videosMetadata, meta => meta['Youtube Id'] === video.id);
+  return Object.assign(video, require(`./data/${video.id}.json`), {
+    title: metadata.Title,
+    bpm: metadata.BPM,
+    year: metadata.Year,
+    director: metadata.Director,
+    album: metadata.Album,
+  });
 });
 
 function groupByHue(colors) {
@@ -82,8 +90,8 @@ class App extends Component {
   }
 
   render() {
-    const histoWidth = 360;
-    const histoHeight = 120;
+    const histoWidth = 480;
+    const histoHeight = 240;
     const histogramStyle = {
       display: 'inline-block',
       width: histoWidth,
@@ -104,11 +112,35 @@ class App extends Component {
         </div>
       );
     });
-    const heatMapData = _.map(videosData, 'groupByHue');
+    const heatmaps = _.chain(videosData)
+      .groupBy(video => video.album)
+      .sortBy(videos => videos[0].year)
+      .map((videos) => {
+        const data = _.map(videos, 'groupByHue');
+        const nameHeight = (14 * videos.length - 10) / videos.length;
+        const videoNames = _.map(videos, d => <div style={{height: nameHeight}}>{d.title}</div>);
+        const nameStyle = {
+          width: 240,
+          textAlign: 'right',
+          padding: 5,
+          fontSize: 10,
+          display: 'inline-block',
+          verticalAlign: 'top',
+        }
+        return (
+          <div style={{position: 'relative'}}>
+            <div style={{marginLeft: 255}}>{videos[0].album}</div>
+            <div style={nameStyle}>
+              {videoNames}
+            </div>
+            <HeatMap data={data} border={true} width={6 * 72} height={14 * videos.length} />
+          </div>
+        )
+      }).value();
 
     return (
       <div className="App">
-        <HeatMap data={heatMapData} border={true} width={2 * histoWidth} height={2 * histoHeight} />
+        {heatmaps}
         {videos}
       </div>
     );
