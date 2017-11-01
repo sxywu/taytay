@@ -24,7 +24,7 @@ const videosData = _.map(require('./data/youtube.json'), video => {
 
 function groupByHue(colors) {
   const groupByHue = d3.nest()
-    .key(d => _.floor(d.color[hue] / 5) * 5)
+    .key(d => _.floor(d.color[hue] / 5))
     .sortKeys((a, b) => {
       a = parseInt(a);
       b = parseInt(b);
@@ -37,7 +37,8 @@ function groupByHue(colors) {
     .entries(colors);
   _.each(groupByHue, group => {
     Object.assign(group, {
-      hue: parseInt(group.key),
+      key: parseInt(group.key),
+      hue: _.floor(group.values[0].color[hue] / 5) * 5,
       sum: _.sumBy(group.values, value => value.size),
     });
   });
@@ -70,12 +71,6 @@ function groupByHueLightness(colors) {
       a = parseFloat(a);
       b = parseFloat(b);
       return d3.ascending(a, b);
-      // const [aH, aL] = _.map(a.split('-'), parseFloat);
-      // const [bH, bL] = _.map(b.split('-'), parseFloat);
-      // if (aH === bH) {
-      //   return d3.descending(aL, bL);
-      // }
-      // return d3.ascending(aH, bH);
     }).sortValues((a, b) => {
       a = a.color[saturation];
       b = b.color[saturation];
@@ -107,15 +102,15 @@ class App extends Component {
           Object.assign(color, {color: chroma(color.color).hsl()});
         });
         Object.assign(frame, {
-          // groupByHue: groupByHue(frame.colors),
-          groupByHueLightness: groupByHueLightness(frame.colors),
+          groupByHue: groupByHue(frame.colors),
+          // groupByHueLightness: groupByHueLightness(frame.colors),
         });
       });
 
       Object.assign(video, {
-        // groupByHue: groupByHue(video.colors),
+        groupByHue: groupByHue(video.colors),
         // groupByLightness: groupByLightness(video.colors),
-        groupByHueLightness: groupByHueLightness(video.colors),
+        // groupByHueLightness: groupByHueLightness(video.colors),
       });
     });
   }
@@ -133,13 +128,13 @@ class App extends Component {
     };
 
     const videos = _.map(videosData, video => {
-      const heatMapData = _.map(video.frames, 'groupByHueLightness');
-      const heatMapHeight = video.frames.length * 8;
+      const heatMapHeight = video.frames.length * 4;
       return (
         <div style={histogramStyle}>
-          <p><strong>{video.snippet.title}</strong></p>
-          <Histogram groups={video.groupByHueLightness} width={histoWidth} height={histoHeight} />
-          <HeatMap data={heatMapData} border={true} width={histoWidth} height={heatMapHeight} />
+          <p><strong>{video.title}</strong></p>
+          <Histogram groups={video.groupByHue} numBlocks={72}width={histoWidth} height={histoHeight} />
+          <HeatMap data={_.map(video.frames, 'groupByHue')} numBlocks={72}
+            width={histoWidth} height={heatMapHeight} />
         </div>
       );
     });
@@ -163,7 +158,7 @@ class App extends Component {
             <div style={nameStyle}>
               {videoNames}
             </div>
-            <HeatMap data={_.map(videos, 'groupByHueLightness')}
+            <HeatMap data={_.map(videos, 'groupByHue')} numBlocks={72}
               border={true} width={6 * 80} height={14 * videos.length} />
           </div>
         )

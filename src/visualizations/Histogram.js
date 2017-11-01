@@ -8,7 +8,6 @@ const saturation = 1;
 const lightness = 2;
 
 const margin = {left: 5, top: 5, right: 5, bottom: 20};
-const numBlocks = 80;
 
 class Histogram extends Component {
 
@@ -29,7 +28,7 @@ class Histogram extends Component {
   }
 
   processData() {
-    this.colorWidth = (this.props.width - margin.left - margin.right) / numBlocks;
+    this.colorWidth = (this.props.width - margin.left - margin.right) / this.props.numBlocks;
 
     const sumMax = d3.max(this.props.groups, d => d.sum);
     this.heightScale.domain([0, sumMax])
@@ -63,7 +62,7 @@ class Histogram extends Component {
     const y = this.props.height - 1 * margin.bottom + 2;
     const colorHeight = 0.75 * this.colorWidth;
     _.each(this.props.groups, group => {
-      const color = chroma(group.hue, 0.75, group.lightness, 'hsl');
+      const color = chroma(group.hue, 0.75, group.lightness || 0.5, 'hsl');
       const x = group.key * this.colorWidth + margin.left;
 
       this.ctx.beginPath();

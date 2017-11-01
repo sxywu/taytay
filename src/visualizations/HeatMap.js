@@ -4,14 +4,13 @@ import _ from 'lodash';
 import chroma from 'chroma-js';
 
 const margin = {left: 5, top: 5, right: 5, bottom: 5};
-const numBlocks = 80;
 
 class HeatMap extends Component {
   componentDidMount() {
     this.canvas = d3.select(this.refs.container);
     this.ctx = this.refs.container.getContext('2d');
 
-    this.colorWidth = (this.props.width - margin.left - margin.right) / numBlocks;
+    this.colorWidth = (this.props.width - margin.left - margin.right) / this.props.numBlocks;
     this.opacityScale = d3.scaleLinear().range([10, 100]);
 
     this.renderData();
@@ -29,7 +28,7 @@ class HeatMap extends Component {
         const opacity = this.opacityScale(column.sum) / 100;
         let color = _.maxBy(column.values, value => value.size);
         color = chroma(color.color[0], color.color[1], color.color[2], 'hsl');
-        color = `rgba(${color.alpha(opacity).rgba()})`;
+        // color = `rgba(${color.alpha(opacity).rgba()})`;
         const x = column.key * this.colorWidth + margin.left;
 
         this.ctx.beginPath();
@@ -49,7 +48,7 @@ class HeatMap extends Component {
       this.ctx.clearRect(margin.left, y, this.props.width - margin.left - margin.right, 1);
       this.ctx.fillRect(margin.left, y, this.props.width - margin.left - margin.right, 1);
     });
-    _.times(numBlocks + 1, i => {
+    _.times(this.props.numBlocks + 1, i => {
       const x = i * this.colorWidth + margin.left;
       this.ctx.clearRect(x, margin.top, 1, this.props.height - margin.top - margin.bottom);
       this.ctx.fillRect(x, margin.top, 1, this.props.height - margin.top - margin.bottom);
