@@ -108,7 +108,7 @@ class App extends Component {
         <div style={histogramStyle}>
           <p><strong>{video.snippet.title}</strong></p>
           <Histogram groups={video.groupByHue} width={histoWidth} height={histoHeight} />
-          <HeatMap data={heatMapData} width={histoWidth} height={heatMapHeight} />
+          <HeatMap data={heatMapData} hue={true} width={histoWidth} height={heatMapHeight} />
         </div>
       );
     });
@@ -116,7 +116,8 @@ class App extends Component {
       .groupBy(video => video.album)
       .sortBy(videos => videos[0].year)
       .map((videos) => {
-        const data = _.map(videos, 'groupByHue');
+        const hueData = _.map(videos, 'groupByHue');
+        const lightnessData = _.map(videos, 'groupByLightness');
         const nameHeight = (14 * videos.length - 10) / videos.length;
         const videoNames = _.map(videos, d => <div style={{height: nameHeight}}>{d.title}</div>);
         const nameStyle = {
@@ -133,7 +134,8 @@ class App extends Component {
             <div style={nameStyle}>
               {videoNames}
             </div>
-            <HeatMap data={data} border={true} width={6 * 72} height={14 * videos.length} />
+            <HeatMap data={hueData} hue={true} border={true} width={6 * 72} height={14 * videos.length} />
+            <HeatMap data={lightnessData} hue={false} border={true} width={6 * 40} height={14 * videos.length} />
           </div>
         )
       }).value();
