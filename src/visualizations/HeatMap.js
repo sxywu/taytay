@@ -8,7 +8,8 @@ const margin = {left: 5, top: 5, right: 5, bottom: 5};
 class HeatMap extends Component {
   componentDidMount() {
     this.canvas = d3.select(this.refs.container)
-      .on('mousemove', this.hoverRow);
+      .on('mousemove', this.hoverRow)
+      .on('mouseleave', () => this.props.hoverRow(null));
     this.ctx = this.refs.container.getContext('2d');
 
     this.colorWidth = (this.props.width - margin.left - margin.right) / this.props.numBlocks;
@@ -52,8 +53,10 @@ class HeatMap extends Component {
   }
 
   hoverRow = () => {
+    const colorHeight = (this.props.height - margin.top - margin.bottom) / this.props.data.length;
+
     const [x, y] = d3.mouse(this.refs.container);
-    let frame = _.floor(y / this.props.rowHeight);
+    let frame = _.floor((y - margin.top) / colorHeight);
 
     this.props.hoverRow(frame);
   }

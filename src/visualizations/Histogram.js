@@ -23,6 +23,7 @@ class Histogram extends Component {
   }
 
   componentDidUpdate() {
+    this.ctx.clearRect(0, 0, this.props.width, this.props.height);
     this.processData();
     this.renderData();
     this.props.legend && this.renderLegend();

@@ -14,6 +14,9 @@ class Video extends Component {
 
   hoverFrame = (frame) => {
     if (frame === this.hoverFrame) return;
+    if (!this.props.data.frames[frame]) {
+      frame = null;
+    }
     this.setState({hoveredFrame: frame});
   }
 
@@ -28,7 +31,7 @@ class Video extends Component {
     };
 
     const histoProps = {
-      groups: this.state.hoveredFrame ?
+      groups: !_.isNull(this.state.hoveredFrame) ?
         this.props.data.frames[this.state.hoveredFrame].groupByHue : this.props.data.groupByHue,
       numBlocks: 72,
       legend: true,
@@ -39,12 +42,12 @@ class Video extends Component {
       data: _.map(this.props.data.frames, 'groupByHue'),
       width: this.props.width,
       height: this.props.data.frames.length * 6,
-      rowHeight: 6,
+      rowHeight: 7,
       numBlocks: 72,
       hoverRow: this.hoverFrame,
     }
     let imageSrc;
-    if (this.state.hoveredFrame) {
+    if (!_.isNull(this.state.hoveredFrame)) {
       imageSrc = this.props.data.frames[this.state.hoveredFrame];
       imageSrc = `/images/${this.props.data.id}/${imageSrc.screenshot}`;
     }
@@ -54,7 +57,7 @@ class Video extends Component {
         <p><strong>{this.props.data.title}</strong></p>
         <Histogram {...histoProps} />
         <HeatMap {...heatMapProps} />
-        <img src={imageSrc} />
+        <img src={imageSrc} width={this.props.width} />
       </div>
     );
   }
