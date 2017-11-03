@@ -31,13 +31,21 @@ class Video extends Component {
     };
 
     const histoProps = {
-      groups: !_.isNull(this.state.hoveredFrame) ?
-        this.props.data.frames[this.state.hoveredFrame].groupByHue : this.props.data.groupByHue,
+      groups: this.props.data.groupByHue,
+      sumMax: d3.max(this.props.data.groupByHue, d => d.sum),
       numBlocks: 72,
       legend: true,
       width: this.props.width,
       height: this.props.height,
     }
+    if (!_.isNull(this.state.hoveredFrame)) {
+      Object.assign(histoProps, {
+        groups: this.props.data.frames[this.state.hoveredFrame].groupByHue,
+        sumMax: _.chain(this.props.data.frames).map('groupByHue')
+          .flatten().maxBy('sum').value().sum,
+      });
+    }
+
     const heatMapProps = {
       data: _.map(this.props.data.frames, 'groupByHue'),
       width: this.props.width,

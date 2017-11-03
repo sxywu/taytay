@@ -33,7 +33,7 @@ class Histogram extends Component {
   processData() {
     this.colorWidth = (this.props.width - margin.left - margin.right) / this.props.numBlocks;
 
-    const sumMax = d3.max(this.props.groups, d => d.sum);
+    const sumMax = this.props.sumMax || d3.max(this.props.groups, d => d.sum);
     let heightMax = this.props.height - margin.top;
     if (this.props.legend) {
       heightMax = heightMax - margin.top - margin.bottom;
