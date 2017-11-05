@@ -52,7 +52,8 @@ class Video extends Component {
       height: this.props.data.frames.length * 6,
       rowHeight: 7,
       numBlocks: 72,
-      hoverRow: this.hoverFrame,
+      hoverRow: this.hoverFrame, // function
+      hoveredRow: this.state.hoveredFrame, // index of row hovered
     }
     let imageSrc;
     if (!_.isNull(this.state.hoveredFrame)) {
