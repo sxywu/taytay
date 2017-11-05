@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import _ from 'lodash';
 import chroma from 'chroma-js';
+import {annotation, annotationLabel} from 'd3-svg-annotation';
 
 const margin = {left: 5, top: 5, right: 5, bottom: 5};
 
@@ -13,6 +14,8 @@ class HeatMap extends Component {
     this.ctx = this.refs.canvas.getContext('2d');
 
     this.svg = d3.select(this.refs.svg);
+    this.annotationContainer = this.svg.append('g')
+      .attr('class', 'annotation-group');
     this.hoveredRect = this.svg.append('rect')
       .attr('fill', 'none')
       .attr('stroke', '#111')
@@ -21,15 +24,18 @@ class HeatMap extends Component {
 
     this.colorWidth = (this.props.width - margin.left - margin.right) / this.props.numBlocks;
     this.opacityScale = d3.scaleLinear().range([10, 100]);
+    this.makeAnnotations = annotation().type(annotationLabel);
 
     this.colorHeight = (this.props.height - margin.top - margin.bottom) / this.props.data.length;
     this.renderData();
     this.renderBorders();
+    this.renderAnnotations();
     this.renderHover();
   }
 
   componentDidUpdate() {
     this.colorHeight = (this.props.height - margin.top - margin.bottom) / this.props.data.length;
+    this.renderAnnotations();
     this.renderHover();
   }
 
@@ -64,6 +70,25 @@ class HeatMap extends Component {
     });
   }
 
+  renderAnnotations() {
+    const numAnnotations = Math.floor(this.props.data.length / 12) + 1;
+    const annotationsData = _.times(numAnnotations, i => {
+      return {
+        note: {label: `${i}min`, padding: 5, orientation: 'leftRight', align: 'middle'},
+        x: margin.left, y: i * 12 * this.colorHeight + margin.top,
+        dx: this.props.width - margin.left - margin.right,
+      }
+    });
+
+    this.makeAnnotations.annotations(annotationsData);
+    this.annotationContainer.call(this.makeAnnotations);
+    this.annotationContainer.selectAll('text')
+      .attr('fill', '#111')
+      .style('font-size', 10);
+    this.annotationContainer.selectAll('path')
+      .attr('stroke', '#111');
+  }
+
   renderHover() {
     if (_.isNull(this.props.hoveredRow)) {
       this.hoveredRect.style('display', 'none');
@@ -85,11 +110,16 @@ class HeatMap extends Component {
   }
 
   render() {
+    const svgStyle = {
+      position: 'absolute',
+      top: 0, left: 0,
+      pointerEvents: 'none',
+      overflow: 'visible',
+    };
     return (
       <div style={{position: 'relative'}}>
         <canvas ref='canvas' width={this.props.width} height={this.props.height} />
-        <svg ref='svg' style={{position: 'absolute', top: 0, left: 0, pointerEvents: 'none'}}
-          width={this.props.width} height={this.props.height} />
+        <svg ref='svg' style={svgStyle} width={this.props.width} height={this.props.height} />
       </div>
     );
   }
