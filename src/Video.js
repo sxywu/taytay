@@ -47,7 +47,7 @@ class Video extends Component {
     }
 
     const heatMapProps = {
-      data: _.map(this.props.data.frames, 'groupByHue'),
+      data: _.map(this.props.data.filteredFrames, 'groupByHue'),
       width: this.props.width,
       height: this.props.data.frames.length * 6,
       rowHeight: 7,

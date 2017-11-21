@@ -5,6 +5,7 @@ import chroma from 'chroma-js';
 
 import Histogram from './visualizations/Histogram';
 import Video from './Video';
+import FilterData from './FilterData';
 
 const hue = 0;
 const saturation = 1;
@@ -91,6 +92,14 @@ function groupByHueLightness(colors) {
 }
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      filteredHue: [0, 360]
+    };
+  }
+
   componentWillMount() {
     this.calculateData();
   }
@@ -122,6 +131,7 @@ class App extends Component {
     const histoWidth = 480;
     const histoHeight = 240;
 
+    FilterData.filterByHue(videosData, [300, 320]);
     const videos = _.map(videosData, video =>
       <Video data={video} width={histoWidth} height={histoHeight} />);
 
