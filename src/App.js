@@ -20,8 +20,9 @@ const videosData = _.chain(require('./data/youtube.json'))
       year: metadata.Year,
       director: metadata.Director,
       album: metadata.Album,
+      concert: metadata.Concert,
     });
-  }).filter(video => video.album).value();
+  }).filter(video => video.album && !video.concert).value();
 
 function groupByHue(colors) {
   const groupByHue = d3.nest()

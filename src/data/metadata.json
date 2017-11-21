@@ -117,7 +117,8 @@
     "Director": "Christian Lamb",
     "Youtube Id": "oKar-tF__ac",
     "BPM": 126,
-    "Album": "Speak Now"
+    "Album": "Speak Now",
+    "Concert": true
   },
   {
     "Title": "Ours",
@@ -181,7 +182,8 @@
     "Director": "Kenny Jackson",
     "Youtube Id": "Zlot0i3Zykw",
     "BPM": 125,
-    "Album": "Red"
+    "Album": "Red",
+    "Concert": true
   },
   {
     "Title": "The Last Time",
@@ -189,7 +191,8 @@
     "Director": "Terry Richardson",
     "Youtube Id": "QuijXg8wm28",
     "BPM": 94,
-    "Album": "Red"
+    "Album": "Red",
+    "Concert": true
   },
   {
     "Title": "Shake It Off",
@@ -245,7 +248,8 @@
     "Director": "Jonas Åkerlund",
     "Youtube Id": "wyK7YuwUWsU",
     "BPM": 122,
-    "Album": 1989
+    "Album": 1989,
+    "Concert": true
   },
   {
     "Title": "I Don't Wanna Live Forever",
