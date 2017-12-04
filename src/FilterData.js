@@ -73,7 +73,7 @@ function groupByHueLightness(colors) {
   return groupByHueLightness;
 }
 
-function keepColor(color, hueRange, satRange, lightRange) {
+FilterData.keepColor = (color, hueRange, satRange, lightRange) => {
   return hueRange[0] <= color[hue] && color[hue] <= hueRange[1]
     && satRange[0] <= color[saturation] && color[saturation] <= satRange[1]
     && lightRange[0] <= color[lightness] && color[lightness] <= lightRange[1];
@@ -101,14 +101,14 @@ FilterData.filterByHSL = (videos, ranges) => {
     // go through all colors to see if it falls in the ranges
     _.each(video.groupByHue, hue => {
       _.each(hue.values, color => {
-        color.keep = keepColor(color.color, hueRange, satRange, lightRange);
+        color.keep = FilterData.keepColor(color.color, hueRange, satRange, lightRange);
       });
     });
 
     _.each(video.frames, frame => {
       _.each(frame.groupByHue, hue => {
         _.each(hue.values, color => {
-          color.keep = keepColor(color.color, hueRange, satRange, lightRange);
+          color.keep = FilterData.keepColor(color.color, hueRange, satRange, lightRange);
         });
       });
     });

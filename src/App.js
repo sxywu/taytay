@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import _ from 'lodash';
 
+import Beeswarm from './visualizations/Beeswarm';
 import Video from './Video';
 import FilterData from './FilterData';
 
@@ -10,7 +11,7 @@ const saturation = 1;
 const lightness = 2;
 
 const videosMetadata = require('./data/metadata.json');
-const videosData = _.chain(require('./data/youtube.json'))
+let videosData = _.chain(require('./data/youtube.json'))
   .map(video => {
     const metadata = _.find(videosMetadata, meta => meta['Youtube Id'] === video.id);
     return Object.assign(video, require(`./data/${video.id}.json`), {
@@ -28,9 +29,9 @@ class App extends Component {
     super(props);
 
     this.state = {
-      filterRanges: {
-        hueRange: [320, 360],
-        satRange: [0, 1],
+      filters: {
+        hueRange: [0, 360],
+        satRange: [0.5, 1],
         lightRange: [0, 1],
       }
     };
@@ -44,10 +45,11 @@ class App extends Component {
     const histoWidth = 360;
     const histoHeight = 180;
 
-    FilterData.filterByHSL(videosData, this.state.filterRanges);
+    FilterData.filterByHSL(videosData, this.state.filters);
 
     const videos = _.map(videosData, video =>
-      <Video data={video} width={histoWidth} height={histoHeight} />);
+      <Video data={video} filters={this.state.filters}
+        width={histoWidth} height={histoHeight} />);
 
     const summaryWidth = 480;
     const summaryStyle = {
