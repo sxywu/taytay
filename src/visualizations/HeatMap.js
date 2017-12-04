@@ -28,7 +28,7 @@ class HeatMap extends Component {
 
     this.colorHeight = (this.props.height - margin.top - margin.bottom) / this.props.data.length;
     this.renderData();
-    this.renderBorders();
+    // this.renderBorders();
     this.renderAnnotations();
     this.renderHover();
   }
@@ -47,8 +47,13 @@ class HeatMap extends Component {
 
       _.each(row, column => {
         const opacity = this.opacityScale(column.sum) / 100;
-        let color = _.maxBy(column.values, value => value.size);
-        color = chroma(color.color[0], color.color[1], color.color[2], 'hsl');
+        let color = _.filter(column.values, color => color.keep);
+        if (color.length) {
+          color = _.maxBy(column.values, value => value.size).color;
+          color = chroma(color[0], color[1], color[2], 'hsl');
+        } else {
+          color = '#efefef';
+        }
         // color = `rgba(${color.alpha(opacity).rgba()})`;
         const x = column.key * this.colorWidth + margin.left;
 
@@ -66,7 +71,7 @@ class HeatMap extends Component {
     _.times(this.props.data.length + 1, i => {
       const y = i * this.colorHeight + margin.top;
       this.ctx.clearRect(margin.left, y, this.props.width - margin.left - margin.right, 1);
-      this.ctx.fillRect(margin.left, y, this.props.width - margin.left - margin.right, 1);
+      // this.ctx.fillRect(margin.left, y, this.props.width - margin.left - margin.right, 1);
     });
   }
 

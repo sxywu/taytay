@@ -48,7 +48,8 @@ class Histogram extends Component {
       _.each(group.values, value => {
         const colorHeight = this.heightScale(value.size);
         y -= colorHeight;
-        const color = chroma(value.color[0], value.color[1], value.color[2], 'hsl');
+        let color = !value.keep ? '#efefef' :
+          chroma(value.color[0], value.color[1], value.color[2], 'hsl');
 
         this.ctx.beginPath();
         this.ctx.fillStyle = color;
@@ -84,7 +85,7 @@ class Histogram extends Component {
   renderLine() {
     // draw line under chart
     this.ctx.beginPath();
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 1)';
     this.ctx.fillRect(margin.left, this.props.height - (this.props.legend ? margin.bottom : 1),
       this.props.width - margin.left - margin.right, 1);
   }
