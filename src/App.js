@@ -57,7 +57,7 @@ class App extends Component {
       .sortBy(video => -video.keepCount / video.totalCount)
       .take(3)
       .map(video =>
-        <Video data={video} filters={this.state}
+        <Video key={video.id} data={video} filters={this.state}
           width={histoWidth} height={histoHeight} />).value();
 
     const summaryWidth = 480;
