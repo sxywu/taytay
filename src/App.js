@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 import Beeswarm from './visualizations/Beeswarm';
 import Video from './Video';
+import BarChart from './visualizations/BarChart';
 import FilterData from './FilterData';
 
 const hue = 0;
@@ -29,11 +30,9 @@ class App extends Component {
     super(props);
 
     this.state = {
-      filters: {
-        hueRange: [0, 360],
-        satRange: [0.5, 1],
-        lightRange: [0, 1],
-      }
+      hueRange: [0, 360],
+      satRange: [0, 1],
+      lightRange: [0, 1],
     };
   }
 
@@ -41,15 +40,25 @@ class App extends Component {
     FilterData.calculateData(videosData);
   }
 
+  filter = (type, range) => {
+    const state = this.state;
+    this.state[type + 'Range'] = range;
+    this.setState(state);
+  }
+
   render() {
     const histoWidth = 360;
     const histoHeight = 180;
 
-    FilterData.filterByHSL(videosData, this.state.filters);
+    let filteredVideos = FilterData.filterByHSL(videosData, this.state);
+    let [groupedHues, groupedSat, groupedLight] = FilterData.groupHSL(filteredVideos);
 
-    const videos = _.map(videosData, video =>
-      <Video data={video} filters={this.state.filters}
-        width={histoWidth} height={histoHeight} />);
+    const videos = _.chain(filteredVideos)
+      .sortBy(video => -video.keepCount / video.totalCount)
+      .take(3)
+      .map(video =>
+        <Video data={video} filters={this.state}
+          width={histoWidth} height={histoHeight} />).value();
 
     const summaryWidth = 480;
     const summaryStyle = {
@@ -85,9 +94,17 @@ class App extends Component {
     //     )
     //   }).value();
 
-    console.log(videosData);
+    const barProps = {
+      height: 100,
+      width: histoWidth,
+      filter: this.filter,
+    }
+
     return (
       <div className="App">
+        <BarChart {...barProps} data={groupedHues} type='hue' />
+        <BarChart {...barProps} data={groupedSat} type='sat' />
+        <BarChart {...barProps} data={groupedLight} type='light' />
         {videos}
       </div>
     );
