@@ -13,15 +13,21 @@ class Video extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {hoveredFrame: null};
+    this.state = {hoveredFrame: null, frameColors: null};
+  }
+
+  componentWillMount() {
+    d3.json(`./hsl/${this.props.data.id}.json`, (err, frameColors) => {
+      this.setState({frameColors});
+    });
   }
 
   hoverFrame = (frame) => {
-    if (frame === this.state.hoveredFrame) return;
-    if (!this.props.data.frames[frame]) {
-      frame = null;
-    }
-    this.setState({hoveredFrame: frame});
+    // if (frame === this.state.hoveredFrame) return;
+    // if (!this.props.data.frames[frame]) {
+    //   frame = null;
+    // }
+    // this.setState({hoveredFrame: frame});
   }
 
   render() {
@@ -61,18 +67,22 @@ class Video extends Component {
       hoveredRow: this.state.hoveredFrame, // index of row hovered
     }
 
-    const screenshots = _.chain(this.props.data.frames)
-      .filter(frame => frame.keepCount)
-      .map(frame => {
-        const props = {
-          width: 120,
-          filters: this.props.filters,
-          videoId: this.props.data.id,
-          screenshot: frame.screenshot,
-        }
+    let screenshots;
+    if (this.state.frameColors) {
+      screenshots = _.chain(this.props.data.frames)
+        // .filter(frame => frame.keepCount)
+        .map((frame, i) => {
+          const props = {
+            width: 90,
+            height: 51,
+            filters: this.props.filters,
+            videoId: this.props.data.id,
+            colors: this.state.frameColors[i],
+          }
 
-        return (<Screenshot {...props} />);
-      }).value();
+          return (<Screenshot key={`${this.props.data.id}-${i}`} {...props} />);
+        }).value();
+    }
 
     return (
       <div style={style}>
