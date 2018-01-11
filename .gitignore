@@ -24,6 +24,7 @@ key.txt
 
 videos/*.mp4
 screenshots/
+screenshots.compressed/
 
 public/images/
 
