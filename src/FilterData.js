@@ -6,10 +6,11 @@ const FilterData = {};
 const hue = 0;
 const saturation = 1;
 const lightness = 2;
+const hueStep = 5;
 
 function groupByHue(colors) {
   const groupByHue = d3.nest()
-    .key(d => _.floor(d.color[hue] / 5))
+    .key(d => _.floor(d.color[hue] / hueStep))
     .sortKeys((a, b) => {
       a = parseInt(a);
       b = parseInt(b);
@@ -28,6 +29,26 @@ function groupByHue(colors) {
   });
 
   return groupByHue;
+}
+
+function groupBySaturation(colors) {
+  const groupBySaturation = d3.nest()
+    .key(d => _.floor(d.color[saturation] / 0.025))
+    .sortKeys((a, b) => {
+      a = parseFloat(a);
+      b = parseFloat(b);
+      return d3.ascending(a, b);
+    }).sortValues((a, b) => d3.ascending(a.color[hue], b.color[hue]))
+    .entries(colors);
+  _.each(groupBySaturation, group => {
+    Object.assign(group, {
+      key: parseInt(group.key),
+      saturation: _.floor(group.values[0].color[saturation] / 0.025) * 0.025,
+      sum: _.sumBy(group.values, value => value.size),
+    });
+  });
+
+  return groupBySaturation;
 }
 
 function groupByLightness(colors) {
@@ -74,13 +95,21 @@ function groupByHueLightness(colors) {
 }
 
 FilterData.keepColor = (color, hueRange, satRange, lightRange) => {
-  return hueRange[0] <= color[hue] && color[hue] <= hueRange[1]
-    && satRange[0] <= color[saturation] && color[saturation] <= satRange[1]
+  let keep = satRange[0] <= color[saturation] && color[saturation] <= satRange[1]
     && lightRange[0] <= color[lightness] && color[lightness] <= lightRange[1];
+  if (hueRange[0] > hueRange[1]) {
+    // if it wraps around
+    keep = keep && (hueRange[0] <= color[hue] || color[hue] <= hueRange[1]);
+  } else {
+    keep = keep && hueRange[0] <= color[hue] && color[hue] <= hueRange[1];
+  }
+  return keep;
 };
 
 FilterData.calculateData = (videos) => {
   _.each(videos, video => {
+    video.totalCount = 0;
+
     _.each(video.colors, color => {
       Object.assign(color, {color: chroma(color.color).hsl()});
     });
@@ -89,6 +118,7 @@ FilterData.calculateData = (videos) => {
     _.each(video.frames, frame => {
       _.each(frame.colors, color => {
         Object.assign(color, {color: chroma(color.color).hsl()});
+        video.totalCount += 1;
       });
       Object.assign(frame, {groupByHue: groupByHue(frame.colors)});
     });
@@ -97,8 +127,11 @@ FilterData.calculateData = (videos) => {
 
 FilterData.filterByHSL = (videos, ranges) => {
   const {hueRange, satRange, lightRange} = ranges;
+  const filteredVideos = [];
   _.each(videos, video => {
     // go through all colors to see if it falls in the ranges
+    video.keepCount = 0;
+
     _.each(video.groupByHue, hue => {
       _.each(hue.values, color => {
         color.keep = FilterData.keepColor(color.color, hueRange, satRange, lightRange);
@@ -106,86 +139,39 @@ FilterData.filterByHSL = (videos, ranges) => {
     });
 
     _.each(video.frames, frame => {
+      frame.keepCount = 0;
       _.each(frame.groupByHue, hue => {
         _.each(hue.values, color => {
           color.keep = FilterData.keepColor(color.color, hueRange, satRange, lightRange);
+
+          video.keepCount += color.keep ? 1 : 0;
+          frame.keepCount += color.keep ? 1 : 0;
         });
       });
     });
+
+    if (video.keepCount) {
+      filteredVideos.push(video);
+    }
   })
+
+  return filteredVideos;
 };
 
-// FilterData.filterByHue = (videos, hueRange) => {
-//   const [minHue, maxHue] = hueRange;
-//   _.each(videos, video => {
-//     const filteredColors = _.filter(video.colors, color => {
-//       return minHue <= color.color[hue] && color.color[hue] <= maxHue;
-//     });
-//     Object.assign(video, {
-//       filteredColors,
-//       groupByHue: groupByHue(filteredColors)
-//     });
-//
-//     _.each(video.frames, frame => {
-//       const filteredColors = _.filter(frame.colors, color => {
-//         return minHue <= color.color[hue] && color.color[hue] <= maxHue;
-//       });
-//       Object.assign(frame, {
-//         filteredColors,
-//         groupByHue: groupByHue(filteredColors)
-//       });
-//     });
-//   });
-// }
-//
-// FilterData.filterByLightness = (videos, lightnessRange) => {
-//   const [minLight, maxLight] = lightnessRange;
-//   _.each(videos, video => {
-//     const filteredColors = _.filter(video.filteredColors, color => {
-//       return minLight <= color.color[lightness] &&
-//         color.color[lightness] <= maxLight;
-//     });
-//     Object.assign(video, {
-//       filteredColors,
-//       groupByHue: groupByHue(filteredColors)
-//     });
-//
-//     _.each(video.frames, frame => {
-//       const filteredColors = _.filter(frame.filteredColors, color => {
-//         return minLight <= color.color[lightness] &&
-//           color.color[lightness] <= maxLight;
-//       });
-//       Object.assign(frame, {
-//         filteredColors,
-//         groupByHue: groupByHue(filteredColors)
-//       });
-//     });
-//   });
-// }
-//
-// FilterData.filterBySaturation = (videos, saturationRange) => {
-//   const [minSat, maxSat] = saturationRange;
-//   _.each(videos, video => {
-//     const filteredColors = _.filter(video.filteredColors, color => {
-//       return minSat <= color.color[saturation] &&
-//         color.color[saturation] <= maxSat;
-//     });
-//     Object.assign(video, {
-//       filteredColors,
-//       groupByHue: groupByHue(filteredColors)
-//     });
-//
-//     _.each(video.frames, frame => {
-//       const filteredColors = _.filter(frame.filteredColors, color => {
-//         return minSat <= color.color[saturation] &&
-//           color.color[saturation] <= maxSat;
-//       });
-//       Object.assign(frame, {
-//         filteredColors,
-//         groupByHue: groupByHue(filteredColors)
-//       });
-//     });
-//   });
-// }
+// group the filtered colors by their hue, step =
+FilterData.groupHSL = (videos, type) => {
+  const colors = [];
+  _.each(videos, video => {
+    _.each(video.frames, frame => {
+      _.each(frame.colors, color => {
+        if (color.keep) {
+          colors.push(color);
+        }
+      });
+    });
+  });
+
+  return [groupByHue(colors), groupBySaturation(colors), groupByLightness(colors)];
+}
 
 export default FilterData;
