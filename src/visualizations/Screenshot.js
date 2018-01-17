@@ -5,8 +5,9 @@ import chroma from 'chroma-js';
 import GPU from 'gpu.js';
 
 import FilterData from '../FilterData';
-const imageWidth = 90;
-const imageHeight = 51;
+const ratio = 180 / 320;
+const imageWidth = 160;
+const imageHeight = imageWidth * ratio;
 
 const gpu = new GPU();
 function rgb2l(r, g, b) {
@@ -149,7 +150,7 @@ class Screenshot extends Component {
 
   componentDidMount() {
     this.ctx = this.refs.canvas.getContext('2d');
-    const img = new Image();
+    const img = new Image(imageWidth, imageHeight);
     img.src = `${process.env.PUBLIC_URL}/images/${this.props.videoId}/${this.props.screenshot}`;
 
     img.onload = () => {
