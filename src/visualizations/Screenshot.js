@@ -145,7 +145,7 @@ class Screenshot extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {imageData: null};
+    this.state = {imageData: null, filteredImageData: new ImageData(imageWidth, imageHeight)};
   }
 
   componentDidMount() {
@@ -182,11 +182,9 @@ class Screenshot extends Component {
   renderImage = (imageData) => {
     const {hueRange, satRange, lightRange} = this.props.filters;
     let pixels = filterImage(imageData.data, imageWidth, hueRange, satRange, lightRange);
-    // pixels = new Uint8ClampedArray(_.flattenDeep(pixels));
     pixels = _.flattenDeep(pixels);
-    imageData.data.set(pixels);
-    // const filteredImageData = new ImageData(pixels, imageWidth, imageHeight);
-    this.ctx.putImageData(imageData, 0, 0);
+    this.state.filteredImageData.data.set(pixels);
+    this.ctx.putImageData(this.state.filteredImageData, 0, 0);
     // this.refs.container.appendChild(this.render.getCanvas());
     // const pixels = this.props.colors;
     // const imageWidth = this.props.width;
