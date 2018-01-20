@@ -40,22 +40,28 @@ class BarChart extends Component {
     _.each(this.props.data, group => {
       const x = group.key * this.colorWidth;
       const barHeight = this.heightScale(group.sum);
-
+      const midHue = _.mean(this.props.filters.hueRange);
+      const midSat = _.mean(this.props.filters.satRange);
+      const midLight = _.mean(this.props.filters.lightRange);
       // hue, sat, lightness
       if (this.props.type === 'hue') {
-        this.ctx.fillStyle = chroma(group.hue, 0.75, 0.5, 'hsl').css();
+        this.ctx.fillStyle = chroma(group.hue, midSat, midLight, 'hsl').css();
       } else if (this.props.type === 'sat') {
-        this.ctx.fillStyle = chroma(180, group.saturation, 0.5, 'hsl').css();
+        this.ctx.fillStyle = chroma(midHue, group.saturation, midLight, 'hsl').css();
       } else if (this.props.type === 'light') {
-        this.ctx.fillStyle = chroma(180, 0.75, group.lightness, 'hsl').css();
+        this.ctx.fillStyle = chroma(midHue, midSat, group.lightness, 'hsl').css();
       }
       this.ctx.fillRect(x, this.props.height - barHeight, this.colorWidth, barHeight);
     });
   }
 
   onBrushEnd = () => {
-    const [minX, maxX] = d3.event.selection;
-    this.props.filter(this.props.type, [this.xScale.invert(minX), this.xScale.invert(maxX)]);
+    let [minX, maxX] = this.xScale.range();
+    if (d3.event.selection) {
+      minX = d3.event.selection[0];
+      maxX = d3.event.selection[1];
+    }
+    this.props.filterFunc(this.props.type, [this.xScale.invert(minX), this.xScale.invert(maxX)]);
   }
 
   render() {
