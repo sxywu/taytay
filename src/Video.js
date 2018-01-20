@@ -5,7 +5,7 @@ import chroma from 'chroma-js';
 
 import Histogram from './visualizations/Histogram';
 import HeatMap from './visualizations/HeatMap';
-import Screenshot from './visualizations/Screenshot';
+import Screenshots from './visualizations/Screenshots';
 import FilterData from './FilterData';
 const ratio = 180 / 320;
 
@@ -13,13 +13,7 @@ class Video extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {hoveredFrame: null, frameColors: null};
-  }
-
-  componentWillMount() {
-    d3.json(`./hsl/${this.props.data.id}.json`, (err, frameColors) => {
-      this.setState({frameColors});
-    });
+    this.state = {hoveredFrame: null};
   }
 
   hoverFrame = (frame) => {
@@ -33,7 +27,7 @@ class Video extends Component {
   render() {
     const style = {
       display: 'inline-block',
-      width: this.props.width * 3,
+      width: this.props.width * 4,
       margin: 'auto',
       textAlign: 'center',
       padding: 20,
@@ -67,21 +61,10 @@ class Video extends Component {
       hoveredRow: this.state.hoveredFrame, // index of row hovered
     }
 
-    let screenshots;
-    if (this.state.frameColors) {
-      screenshots = _.chain(this.props.data.frames)
-        // .filter(frame => frame.keepCount)
-        .map((frame, i) => {
-          const props = {
-            width: 90,
-            height: 51,
-            filters: this.props.filters,
-            videoId: this.props.data.id,
-            colors: this.state.frameColors[i],
-          }
-
-          return (<Screenshot key={`${this.props.data.id}-${i}`} {...props} />);
-        }).value();
+    const screenshotProps = {
+      filters: this.props.filters,
+      videoId: this.props.data.id,
+      frames: this.props.data.frames,
     }
 
     return (
@@ -91,9 +74,7 @@ class Video extends Component {
           <Histogram {...histoProps} />
           <HeatMap {...heatMapProps} />
         </div>
-        <div style={{display: 'inline-block', width: 1.5 * this.props.width, textAlign: 'left'}}>
-          {screenshots}
-        </div>
+        <Screenshots {...screenshotProps} />
       </div>
     );
   }
