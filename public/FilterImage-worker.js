@@ -141,13 +141,16 @@ onmessage = function(event) {
 
   filterImage.setOutput([4, data.imageWidth, data.imageHeight]);
 
-  let pixels = filterImage(
-    data.imageData.data,
-    data.imageWidth,
-    data.filters.hueRange,
-    data.filters.satRange,
-    data.filters.lightRange
-  );
+  // go through all images
+  const allImagesPixels = data.imageData.map(imageDatum => {
+    return filterImage(
+      imageDatum.data,
+      data.imageWidth,
+      data.filters.hueRange,
+      data.filters.satRange,
+      data.filters.lightRange
+    );
+  });
 
-  this.postMessage({pixels});
+  this.postMessage({allImagesPixels});
 }
