@@ -50,8 +50,8 @@ function getColorsForImage(image) {
 
           videoFrames.push(frameColors);
           // save it to file
-          fs.writeFileSync(`./src/hsl/${videoId}.json`, JSON.stringify(videoFrames));
-          // go to next image
+          fs.writeFileSync(`./public/hsl/${videoId}.json`, JSON.stringify(videoFrames));
+          // // go to next image
           index += 1;
           getColorsForImage(videoData[index]);
         });
