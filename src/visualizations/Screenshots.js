@@ -66,7 +66,7 @@ class Screenshot extends Component {
   onWorkerMessage = (event) => {
     const canvases = this.container.selectAll('canvas').nodes();
     _.each(event.data.allImagesPixels, (pixels, index) => {
-      pixels = _.flattenDeep(pixels);
+      // pixels = _.flattenDeep(pixels);
       const filteredImageDatum = this.state.filteredImageData[index];
       filteredImageDatum.data.set(pixels);
       canvases[index].getContext('2d').putImageData(filteredImageDatum, 0, 0);

@@ -1,7 +1,7 @@
-var window = {};
-importScripts('https://wzrd.in/standalone/gpu.js@latest');
+// var window = {};
+// importScripts('https://wzrd.in/standalone/gpu.js@latest');
 
-const gpu = new window.GPU();
+// const gpu = new window.GPU();
 function rgb2l(r, g, b) {
   r /= 255;
   g /= 255;
@@ -113,39 +113,67 @@ function keepColor(h, s, l, hueRange, satRange, lightRange) {
   return 1;
 }
 
-const filterImage = gpu.createKernel(function(pixels, imageWidth, hueRange, satRange, lightRange) {
-  var x = this.thread.y;
-  var y = this.thread.z;
-  var index = this.thread.x;
-  var offset = x * 4 + y * 4 * imageWidth;
-  var r = pixels[offset];
-  var g = pixels[offset + 1];
-  var b = pixels[offset + 2];
+// const filterImageGPU = gpu.createKernel(function(pixels, imageWidth, hueRange, satRange, lightRange) {
+//   var x = this.thread.y;
+//   var y = this.thread.z;
+//   var index = this.thread.x;
+//   var offset = x * 4 + y * 4 * imageWidth;
+//   var r = pixels[offset];
+//   var g = pixels[offset + 1];
+//   var b = pixels[offset + 2];
+//
+//   var h = rgb2h(r, g, b);
+//   var s = rgb2s(r, g, b);
+//   var l = rgb2l(r, g, b);
+//   var keep = keepColor(h, s, l, hueRange, satRange, lightRange);
+//
+//   if (index === 3) {
+//     return 255;
+//   } else if (keep == 1) {
+//     return pixels[offset + index];
+//   } else {
+//     return 0.21 * r + 0.72 * g + 0.07 * b;
+//   }
+// }).setFunctions([rgb2h, rgb2s, rgb2l, keepColor]);
 
-  var h = rgb2h(r, g, b);
-  var s = rgb2s(r, g, b);
-  var l = rgb2l(r, g, b);
-  var keep = keepColor(h, s, l, hueRange, satRange, lightRange);
+function filterImage(pixels, imageWidth, imageHeight, hueRange, satRange, lightRange) {
+  const filteredPixels = [];
+  let offset = 0;
+  for (i = 0; i < (imageWidth * imageHeight); i += 1) {
+    offset = i * 4;
+    var r = pixels[offset];
+    var g = pixels[offset + 1];
+    var b = pixels[offset + 2];
 
-  if (index === 3) {
-    return 255;
-  } else if (keep == 1) {
-    return pixels[offset + index];
-  } else {
-    return 0.21 * r + 0.72 * g + 0.07 * b;
+    var h = rgb2h(r, g, b);
+    var s = rgb2s(r, g, b);
+    var l = rgb2l(r, g, b);
+    var keep = keepColor(h, s, l, hueRange, satRange, lightRange);
+
+    if (!keep) {
+      r = g = b = 0.21 * r + 0.72 * g + 0.07 * b;
+    }
+
+    filteredPixels.push(r);
+    filteredPixels.push(g);
+    filteredPixels.push(b);
+    filteredPixels.push(255);
   }
-}).setFunctions([rgb2h, rgb2s, rgb2l, keepColor]);
+
+  return filteredPixels
+}
 
 onmessage = function(event) {
   const data = event.data;
 
-  filterImage.setOutput([4, data.imageWidth, data.imageHeight]);
+  // filterImageGPU.setOutput([4, data.imageWidth, data.imageHeight]);
 
   // go through all images
   const allImagesPixels = data.imageData.map(imageDatum => {
     return filterImage(
       imageDatum.data,
       data.imageWidth,
+      data.imageHeight,
       data.filters.hueRange,
       data.filters.satRange,
       data.filters.lightRange
