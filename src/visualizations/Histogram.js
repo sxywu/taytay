@@ -7,7 +7,7 @@ const hue = 0;
 const saturation = 1;
 const lightness = 2;
 
-const margin = {left: 5, top: 5, right: 5, bottom: 20};
+const margin = {left: 0, top: 5, right: 5, bottom: 20};
 
 class Histogram extends Component {
 

@@ -115,7 +115,7 @@ class Screenshot extends Component {
     };
 
     return (
-      <div ref='container' style={style} />
+      <span ref='container' style={style} />
     );
   }
 }

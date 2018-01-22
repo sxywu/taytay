@@ -27,10 +27,8 @@ class Video extends Component {
   render() {
     const style = {
       display: 'inline-block',
-      width: this.props.width * 4,
       margin: 'auto',
-      textAlign: 'center',
-      padding: 20,
+      padding: '0 0 20px 20px',
       verticalAlign: 'top',
     };
 
@@ -51,16 +49,6 @@ class Video extends Component {
       });
     }
 
-    const heatMapProps = {
-      data: _.map(this.props.data.frames, 'groupByHue'),
-      width: this.props.width,
-      height: this.props.data.frames.length * 4,
-      rowHeight: 7,
-      numBlocks: 72,
-      hoverRow: this.hoverFrame, // function
-      hoveredRow: this.state.hoveredFrame, // index of row hovered
-    }
-
     const screenshotProps = {
       filters: this.props.filters,
       videoId: this.props.data.id,
@@ -69,12 +57,11 @@ class Video extends Component {
 
     return (
       <div style={style}>
-        <div style={{display: 'inline-block', width: this.props.width, verticalAlign: 'top', paddingRight: 40}}>
-          <p><strong>{this.props.data.title} ({this.props.data.year})</strong></p>
+        <div><strong>{this.props.data.title} ({this.props.data.year})</strong></div>
+        <div>
           <Histogram {...histoProps} />
-          <HeatMap {...heatMapProps} />
+          <Screenshots {...screenshotProps} />
         </div>
-        <Screenshots {...screenshotProps} />
       </div>
     );
   }

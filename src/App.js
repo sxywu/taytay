@@ -47,8 +47,8 @@ class App extends Component {
   }
 
   render() {
-    const histoWidth = 360;
-    const histoHeight = 180;
+    const histoWidth = 480;
+    const histoHeight = 90;
 
     let filteredVideos = FilterData.filterByHSL(videosData, this.state);
     let [groupedHues, groupedSat, groupedLight] = FilterData.groupHSL(filteredVideos);
