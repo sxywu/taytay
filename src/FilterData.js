@@ -111,14 +111,20 @@ FilterData.calculateData = (videos) => {
     video.totalCount = 0;
 
     _.each(video.colors, color => {
-      Object.assign(color, {color: chroma(color.color).hsl()});
+      const hsl = chroma(color.color).hsl();
+      hsl[0] = hsl[0] || 0; // if hue returns NaN
+      Object.assign(color, {color: hsl});
     });
     Object.assign(video, {groupByHue: groupByHue(video.colors)});
 
     _.each(video.frames, frame => {
+      frame.totalCount = 0;
       _.each(frame.colors, color => {
-        Object.assign(color, {color: chroma(color.color).hsl()});
-        video.totalCount += 1;
+        const hsl = chroma(color.color).hsl();
+        hsl[0] = hsl[0] || 0;
+        Object.assign(color, {color: hsl});
+        video.totalCount += color.size;
+        frame.totalCount += color.size;
       });
       Object.assign(frame, {groupByHue: groupByHue(frame.colors)});
     });
@@ -144,8 +150,8 @@ FilterData.filterByHSL = (videos, ranges) => {
         _.each(hue.values, color => {
           color.keep = FilterData.keepColor(color.color, hueRange, satRange, lightRange);
 
-          video.keepCount += color.keep ? 1 : 0;
-          frame.keepCount += color.keep ? 1 : 0;
+          video.keepCount += color.keep ? color.size : 0;
+          frame.keepCount += color.keep ? color.size : 0;
         });
       });
     });
