@@ -5,9 +5,9 @@ import chroma from 'chroma-js';
 
 import FilterData from '../FilterData';
 const ratio = 180 / 320;
-const imageWidth = 160;
+const imageWidth = 240;
 const imageHeight = imageWidth * ratio;
-const barWidth = 10;
+const barWidth = 8;
 
 class Screenshot extends Component {
 
@@ -31,7 +31,8 @@ class Screenshot extends Component {
     const self = this;
     this.canvases = this.container.selectAll('canvas')
       .data(this.props.frames).enter().append('canvas')
-      .attr('width', barWidth).attr('height', imageHeight)
+      .attr('width', imageWidth).attr('height', imageHeight)
+      .style('display', 'none').style('cursor', 'pointer')
       .each(function(frame, index) {
         const ctx = this.getContext('2d');
 
@@ -40,7 +41,8 @@ class Screenshot extends Component {
         const img = new Image(imageWidth, imageHeight);
         img.src = `${process.env.PUBLIC_URL}/images/${self.props.videoId}/${frame.screenshot}`;
         img.onload = self.onImageLoad.bind(self, index, ctx, img);
-      }).nodes();
+      }).on('mouseover', function(frame, index) { return self.onMouseover(this, index); })
+      .on('mouseleave', function(frame, index) { return self.onMouseleave(this, index); });
   }
 
   onImageLoad = (index, ctx, img) => {
@@ -74,13 +76,16 @@ class Screenshot extends Component {
   }
 
   onWorkerMessage = (event) => {
+    const canvasEls = this.canvases.attr('width', barWidth)
+      .style('display', 'inline-block').nodes();
+
     _.each(event.data.allImagesPixels, (pixels, index) => {
-      // pixels = _.flattenDeep(pixels);
+      // set the filtered image data to state
       const filteredImageDatum = this.state.filteredImageData[index];
       filteredImageDatum.data.set(pixels);
-      const ctx = this.canvases[index].getContext('2d');
-      ctx.clearRect(0, 0, imageWidth + barWidth, imageHeight);
-      ctx.putImageData(filteredImageDatum, barWidth + 1, 0);
+      // draw only the bars at first
+      const ctx = canvasEls[index].getContext('2d');
+      ctx.clearRect(0, 0, barWidth, imageHeight);
       this.renderBars(ctx, this.barsData[index]);
     });
   }
@@ -93,7 +98,7 @@ class Screenshot extends Component {
       .filter(color => color.keep)
       .sortBy(color => -color.color[2])
       .map(color => {
-        let height = (color.size / totalCount) * imageHeight;
+        let height = (color.size / totalCount) * (0.75 * imageHeight);
         y = y - height;
         height += 1;
         return {height, y, color: color.color};
@@ -106,6 +111,26 @@ class Screenshot extends Component {
       ctx.fillStyle = chroma(bar.color[0], bar.color[1], bar.color[2], 'hsl').css();
       ctx.fillRect(0, bar.y, barWidth, bar.height);
     });
+  }
+
+  onMouseover = (canvas, index) => {
+    const filteredImageDatum = this.state.filteredImageData[index];
+    if (!filteredImageDatum) return;
+    // if there is the data, expand
+
+    const padding = 2;
+    d3.select(canvas).attr('width', imageWidth + 2 * padding)
+      .attr('height', imageHeight);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, imageWidth, imageHeight);
+    ctx.putImageData(filteredImageDatum, padding, 0);
+  }
+
+  onMouseleave = (canvas, index) => {
+    d3.select(canvas).attr('width', barWidth);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, barWidth, imageHeight);
+    this.renderBars(ctx, this.barsData[index]);
   }
 
   render() {
