@@ -36,22 +36,15 @@ class Video extends Component {
       verticalAlign: 'top',
     };
 
+    const groups = this.props.data.frames[this.state.hoveredFrame].groupByHue;
     const histoProps = {
-      groups: this.props.data.groupByHue,
-      sumMax: d3.max(this.props.data.groupByHue, d => d.sum),
+      groups,
+      sumMax: d3.max(groups, d => d.sum),
       numBlocks: 72,
       // legend: true,
       width: this.props.width,
       height: this.props.height,
-    }
-    if (!_.isNull(this.state.hoveredFrame)) {
-      const sumMax = _.chain(this.props.data.frames).map('groupByHue')
-        .flatten().maxBy('sum').value();
-      Object.assign(histoProps, {
-        groups: this.props.data.frames[this.state.hoveredFrame].groupByHue,
-        sumMax: sumMax ? sumMax.sum : 0,
-      });
-    }
+    };
 
     const screenshotProps = {
       filters: this.props.filters,
