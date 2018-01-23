@@ -28,17 +28,19 @@ class Screenshot extends Component {
 
     // make a canvas for each screenshot
     this.barsData = [];
-    _.each(this.props.frames, (frame, index) => {
-      const canvas = this.container.append('canvas')
-        .attr('width', barWidth).attr('height', imageHeight).node();
-      const ctx = canvas.getContext('2d');
+    const self = this;
+    this.canvases = this.container.selectAll('canvas')
+      .data(this.props.frames).enter().append('canvas')
+      .attr('width', barWidth).attr('height', imageHeight)
+      .each(function(frame, index) {
+        const ctx = this.getContext('2d');
 
-      this.barsData.push(this.calculateBars(frame));
-      // get image data
-      const img = new Image(imageWidth, imageHeight);
-      img.src = `${process.env.PUBLIC_URL}/images/${this.props.videoId}/${frame.screenshot}`;
-      img.onload = this.onImageLoad.bind(this, index, ctx, img);
-    });
+        self.barsData.push(self.calculateBars(frame));
+        // get image data
+        const img = new Image(imageWidth, imageHeight);
+        img.src = `${process.env.PUBLIC_URL}/images/${self.props.videoId}/${frame.screenshot}`;
+        img.onload = self.onImageLoad.bind(self, index, ctx, img);
+      }).nodes();
   }
 
   onImageLoad = (index, ctx, img) => {
@@ -72,12 +74,11 @@ class Screenshot extends Component {
   }
 
   onWorkerMessage = (event) => {
-    const canvases = this.container.selectAll('canvas').nodes();
     _.each(event.data.allImagesPixels, (pixels, index) => {
       // pixels = _.flattenDeep(pixels);
       const filteredImageDatum = this.state.filteredImageData[index];
       filteredImageDatum.data.set(pixels);
-      const ctx = canvases[index].getContext('2d');
+      const ctx = this.canvases[index].getContext('2d');
       ctx.clearRect(0, 0, imageWidth + barWidth, imageHeight);
       ctx.putImageData(filteredImageDatum, barWidth + 1, 0);
       this.renderBars(ctx, this.barsData[index]);
