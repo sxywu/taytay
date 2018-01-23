@@ -7,7 +7,7 @@ import FilterData from '../FilterData';
 const ratio = 180 / 320;
 const imageWidth = 240;
 const imageHeight = imageWidth * ratio;
-const barWidth = 8;
+const barWidth = 10;
 
 class Screenshot extends Component {
 
@@ -98,7 +98,7 @@ class Screenshot extends Component {
       .filter(color => color.keep)
       .sortBy(color => -color.color[2])
       .map(color => {
-        let height = (color.size / totalCount) * (0.75 * imageHeight);
+        let height = (color.size / totalCount) * (1 * imageHeight);
         y = y - height;
         height += 1;
         return {height, y, color: color.color};
@@ -110,6 +110,7 @@ class Screenshot extends Component {
     _.each(bars, bar => {
       ctx.fillStyle = chroma(bar.color[0], bar.color[1], bar.color[2], 'hsl').css();
       ctx.fillRect(0, bar.y, barWidth, bar.height);
+      // ctx.clearRect(0, 0, 1, imageHeight);
     });
   }
 
@@ -136,7 +137,6 @@ class Screenshot extends Component {
   render() {
     const style = {
       display: 'inline-block',
-      width: 5 * imageWidth,
       textAlign: 'left'
     };
 
