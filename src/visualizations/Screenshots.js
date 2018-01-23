@@ -41,8 +41,7 @@ class Screenshot extends Component {
         const img = new Image(imageWidth, imageHeight);
         img.src = `${process.env.PUBLIC_URL}/images/${self.props.videoId}/${frame.screenshot}`;
         img.onload = self.onImageLoad.bind(self, index, ctx, img);
-      }).on('mouseover', function(frame, index) { return self.onMouseover(this, index); })
-      .on('mouseleave', function(frame, index) { return self.onMouseleave(this, index); });
+      }).on('mouseover', (frame, index) => this.props.hoverFrame(index));
   }
 
   onImageLoad = (index, ctx, img) => {
@@ -60,10 +59,15 @@ class Screenshot extends Component {
 
   componentDidUpdate() {
     if (!this.state.imageData) return;
-    this.barsData = [];
-    _.each(this.props.frames, frame => this.barsData.push(this.calculateBars(frame)));
 
-    this.postWorkerMessage();
+    if (this.props.updateFilters) {
+      this.barsData = [];
+      _.each(this.props.frames, frame => this.barsData.push(this.calculateBars(frame)));
+
+      this.postWorkerMessage();
+    } else {
+      this.renderHovered();
+    }
   }
 
   postWorkerMessage = () => {
@@ -76,19 +80,44 @@ class Screenshot extends Component {
   }
 
   onWorkerMessage = (event) => {
-    const canvasEls = this.canvases.attr('width', barWidth)
-      .style('display', 'inline-block').nodes();
-
     _.each(event.data.allImagesPixels, (pixels, index) => {
       // set the filtered image data to state
       const filteredImageDatum = this.state.filteredImageData[index];
       filteredImageDatum.data.set(pixels);
-      // draw only the bars at first
-      const ctx = canvasEls[index].getContext('2d');
-      ctx.clearRect(0, 0, barWidth, imageHeight);
-      this.renderBars(ctx, this.barsData[index]);
     });
+
+    const self = this;
+    this.canvases.attr('width', barWidth).style('display', 'inline-block')
+      .each(function(frame, index) {
+        const ctx = this.getContext('2d');
+        ctx.clearRect(0, 0, barWidth, imageHeight);
+        self.renderBars(ctx, self.barsData[index]);
+      });
+
+    this.renderHovered();
   }
+
+  renderHovered() {
+    const padding = 2;
+
+    // set the previously hovered frame back to just the bars
+    const prevCanvas = this.canvases.nodes()[this.props.prevHovered];
+    d3.select(prevCanvas).attr('width', barWidth);
+    const prevCtx = prevCanvas.getContext('2d');
+    prevCtx.clearRect(0, 0, barWidth, imageHeight);
+    this.renderBars(prevCtx, this.barsData[this.props.prevHovered]);
+
+    const filteredImageDatum = this.state.filteredImageData[this.props.hoveredFrame];
+    if (!filteredImageDatum) return;
+
+    // hovered frame: clear it and then draw image
+    const hoveredCanvas = this.canvases.nodes()[this.props.hoveredFrame];
+    d3.select(hoveredCanvas).attr('width', imageWidth + 2 * padding);
+    const hoveredCtx = hoveredCanvas.getContext('2d');
+    hoveredCtx.clearRect(0, 0, imageWidth, imageHeight);
+    hoveredCtx.putImageData(filteredImageDatum, padding, 0);
+  }
+
 
   // calculate all colors that aren't filtered out for given frame
   calculateBars(frame) {
@@ -112,26 +141,6 @@ class Screenshot extends Component {
       ctx.fillRect(0, bar.y, barWidth, bar.height);
       // ctx.clearRect(0, 0, 1, imageHeight);
     });
-  }
-
-  onMouseover = (canvas, index) => {
-    const filteredImageDatum = this.state.filteredImageData[index];
-    if (!filteredImageDatum) return;
-    // if there is the data, expand
-
-    const padding = 2;
-    d3.select(canvas).attr('width', imageWidth + 2 * padding)
-      .attr('height', imageHeight);
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, imageWidth, imageHeight);
-    ctx.putImageData(filteredImageDatum, padding, 0);
-  }
-
-  onMouseleave = (canvas, index) => {
-    d3.select(canvas).attr('width', barWidth);
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, barWidth, imageHeight);
-    this.renderBars(ctx, this.barsData[index]);
   }
 
   render() {

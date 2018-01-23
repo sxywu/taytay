@@ -13,15 +13,19 @@ class Video extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {hoveredFrame: null};
+    this.state = {hoveredFrame: 0, updateFilters: false, prevHovered: 0};
+  }
+
+  componentWillReceiveProps() {
+    this.setState({hoveredFrame: 0, updateFilters: true});
   }
 
   hoverFrame = (frame) => {
-    // if (frame === this.state.hoveredFrame) return;
-    // if (!this.props.data.frames[frame]) {
-    //   frame = null;
-    // }
-    // this.setState({hoveredFrame: frame});
+    if (frame === this.state.hoveredFrame) return;
+    if (!this.props.data.frames[frame]) {
+      frame = 0;
+    }
+    this.setState({hoveredFrame: frame, prevHovered: this.state.hoveredFrame, updateFilters: false});
   }
 
   render() {
@@ -53,6 +57,10 @@ class Video extends Component {
       filters: this.props.filters,
       videoId: this.props.data.id,
       frames: this.props.data.frames,
+      hoveredFrame: this.state.hoveredFrame,
+      prevHovered: this.state.prevHovered,
+      hoverFrame: this.hoverFrame,
+      updateFilters: this.state.updateFilters,
     }
 
     return (
