@@ -5,7 +5,7 @@ import chroma from 'chroma-js';
 
 import FilterData from '../FilterData';
 const ratio = 180 / 320;
-const imageWidth = 240;
+const imageWidth = 160;
 const imageHeight = imageWidth * ratio;
 const barWidth = 10;
 

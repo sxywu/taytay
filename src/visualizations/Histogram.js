@@ -7,6 +7,8 @@ const hue = 0;
 const saturation = 1;
 const lightness = 2;
 
+const histoWidth = 360;
+const histoHeight = 90;
 const margin = {left: 0, top: 5, right: 5, bottom: 20};
 
 class Histogram extends Component {
@@ -23,7 +25,7 @@ class Histogram extends Component {
   }
 
   componentDidUpdate() {
-    this.ctx.clearRect(0, 0, this.props.width, this.props.height);
+    this.ctx.clearRect(0, 0, histoWidth, histoHeight);
     this.processData();
     this.renderData();
     this.props.legend && this.renderLegend();
@@ -31,10 +33,10 @@ class Histogram extends Component {
   }
 
   processData() {
-    this.colorWidth = (this.props.width - margin.left - margin.right) / this.props.numBlocks;
+    this.colorWidth = (histoWidth - margin.left - margin.right) / this.props.numBlocks;
 
     const sumMax = this.props.sumMax || d3.max(this.props.groups, d => d.sum);
-    let heightMax = this.props.height - margin.top;
+    let heightMax = histoHeight - margin.top;
     if (this.props.legend) {
       heightMax = heightMax - margin.top - margin.bottom;
     }
@@ -44,7 +46,7 @@ class Histogram extends Component {
   renderData() {
     _.each(this.props.groups, group => {
       const x = group.key * this.colorWidth + margin.left;
-      let y = this.props.height - (this.props.legend ? margin.bottom : 0);
+      let y = histoHeight - (this.props.legend ? margin.bottom : 0);
       _.each(group.values, value => {
         const colorHeight = this.heightScale(value.size);
         y -= colorHeight;
@@ -59,14 +61,14 @@ class Histogram extends Component {
         this.ctx.stroke();
       });
 
-      this.ctx.clearRect(x - 1, 0, 1, this.props.height);
-      this.ctx.clearRect(x + this.colorWidth - 0.25, 0, this.props.width, this.props.height);
+      this.ctx.clearRect(x - 1, 0, 1, histoHeight);
+      this.ctx.clearRect(x + this.colorWidth - 0.25, 0, histoWidth, histoHeight);
     });
   }
 
   renderLegend() {
     // color legend under chart
-    const y = this.props.height - 1 * margin.bottom + 2;
+    const y = histoHeight - 1 * margin.bottom + 2;
     const colorHeight = 0.75 * this.colorWidth;
     _.each(this.props.groups, group => {
       const color = chroma(group.hue, 0.75, group.lightness || 0.5, 'hsl');
@@ -78,7 +80,7 @@ class Histogram extends Component {
       this.ctx.fill();
 
       this.ctx.clearRect(x - 1, y, 1, colorHeight);
-      this.ctx.clearRect(x + this.colorWidth - 0.25, y, this.props.width, colorHeight);
+      this.ctx.clearRect(x + this.colorWidth - 0.25, y, histoWidth, colorHeight);
     });
   }
 
@@ -86,13 +88,13 @@ class Histogram extends Component {
     // draw line under chart
     this.ctx.beginPath();
     this.ctx.fillStyle = 'rgba(0, 0, 0, 1)';
-    this.ctx.fillRect(margin.left, this.props.height - (this.props.legend ? margin.bottom : 1),
-      this.props.width - margin.left - margin.right, 1);
+    this.ctx.fillRect(margin.left, histoHeight - (this.props.legend ? margin.bottom : 1),
+      histoWidth - margin.left - margin.right, 1);
   }
 
   render() {
     return (
-      <canvas ref='container' width={this.props.width} height={this.props.height} />
+      <canvas ref='container' width={histoWidth} height={histoHeight} />
     );
   }
 }

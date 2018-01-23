@@ -30,7 +30,6 @@ class Video extends Component {
 
   render() {
     const style = {
-      display: 'inline-block',
       margin: 'auto',
       padding: '0 0 20px 20px',
       verticalAlign: 'top',
@@ -41,9 +40,6 @@ class Video extends Component {
       groups,
       sumMax: d3.max(groups, d => d.sum),
       numBlocks: 72,
-      // legend: true,
-      width: this.props.width,
-      height: this.props.height,
     };
 
     const screenshotProps = {

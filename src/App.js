@@ -47,18 +47,14 @@ class App extends Component {
   }
 
   render() {
-    const histoWidth = 480;
-    const histoHeight = 135;
-
     let filteredVideos = FilterData.filterByHSL(videosData, this.state);
     let [groupedHues, groupedSat, groupedLight] = FilterData.groupHSL(filteredVideos);
 
     const videos = _.chain(filteredVideos)
       .sortBy(video => -video.keepCount / video.totalCount)
-      .take(3)
+      .take(5)
       .map(video =>
-        <Video key={video.id} data={video} filters={this.state}
-          width={histoWidth} height={histoHeight} />).value();
+        <Video key={video.id} data={video} filters={this.state} />).value();
 
     const summaryWidth = 480;
     const summaryStyle = {
@@ -95,9 +91,10 @@ class App extends Component {
     //   }).value();
 
     const barProps = {
-      height: 100,
-      width: histoWidth,
-      filter: this.filter,
+      height: 60,
+      width: 360,
+      filterFunc: this.filter,
+      filters: this.state,
     }
 
     return (
