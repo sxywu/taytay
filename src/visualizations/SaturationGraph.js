@@ -22,11 +22,13 @@ class SaturationGraph extends Component {
   calculateMedianWithSize(colors) {
     const total = _.sumBy(colors, 'size');
     let sum = 0;
-    return _.find(colors, d => {
+    return _.chain(colors)
+      .sortBy(d => -d.color[1])
+      .find(d => {
         sum += d.size;
         if (sum >= total / 2) return true;
         return false;
-      });
+      }).value();
   }
 
   calculateData() {
@@ -40,29 +42,29 @@ class SaturationGraph extends Component {
         return group;
       }).value();
 
+    const colorsForMedian = [];
     this.swarms = _.chain(this.groups)
       .map(group => {
         return _.map(group.videos, (video, i) => {
           const x = group.x + i * songWidth;
-          return _.chain(video.colors)
-            .filter(color => 0.2 < color.color[2] && color.color[2] < 0.8)
+          const colors = _.chain(video.colors)
+            .filter(color => 0.2 < color.color[2] && color.color[2] < 0.8).value();
+          colorsForMedian.push(colors);
+          return _.chain(colors)
             .sortBy(color => -color.size).take(Math.floor(0.25 * video.colors.length))
             .map(color => Object.assign(color, {bounds: [x, x + songWidth]}))
             .value();
         });
       }).flattenDeep().value();
 
-    const allSats = [];
     this.medians = _.chain(this.groups)
       .map(group => {
         const videos = _.map(group.videos, (video, i) => {
           const colors = _.chain(video.colors)
-            .filter(d => 0.2 < d.color[2] && d.color[2] < 0.8)
-            .sortBy(d => d.color[1]).value();
+            .filter(d => 0.2 < d.color[2] && d.color[2] < 0.8).value();
           const medianColor = this.calculateMedianWithSize(colors);
           const y = yScale(medianColor.color[1]);
 
-          allSats.push(y);
           return {
             title: video.title,
             x: group.x + (i + 0.5) * songWidth,
@@ -76,8 +78,7 @@ class SaturationGraph extends Component {
         }
       }).value();
 
-    // let overall = _.sortBy(allSats);
-    this.overallMedian = this.calculateMedianWithSize(this.swarms);
+    this.overallMedian = this.calculateMedianWithSize(_.flatten(colorsForMedian));
     this.overallMedian = yScale(this.overallMedian.color[1]);
   }
 
