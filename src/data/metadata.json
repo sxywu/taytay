@@ -8,6 +8,14 @@
     "Album": "Taylor Swift"
   },
   {
+    "Title": "Picture to Burn",
+    "Year": 2008,
+    "Director": "Trey Fanjoy",
+    "Youtube Id": "yCMqcFAigRg",
+    "BPM": 106,
+    "Album": "Taylor Swift"
+  },
+  {
     "Title": "Teardrops on My Guitar",
     "Year": 2007,
     "Director": "Trey Fanjoy",
@@ -24,19 +32,20 @@
     "Album": "Taylor Swift"
   },
   {
-    "Title": "Picture to Burn",
-    "Year": 2008,
-    "Director": "Trey Fanjoy",
-    "Youtube Id": "yCMqcFAigRg",
-    "BPM": 106,
-    "Album": "Taylor Swift"
+    "Title": "Fearless",
+    "Year": 2010,
+    "Director": "Todd Cassetty",
+    "Youtube Id": "ptSjNWnzpjg",
+    "BPM": 100,
+    "Album": "Fearless",
+    "concert": true
   },
   {
-    "Title": "Change",
-    "Year": 2008,
-    "Director": "Shawn Robbins",
-    "Youtube Id": "B1jYllE0T-k",
-    "BPM": 96,
+    "Title": "Fifteen",
+    "Year": 2009,
+    "Director": "Roman White",
+    "Youtube Id": "Pb-K2tXWK4w",
+    "BPM": 95,
     "Album": "Fearless"
   },
   {
@@ -64,20 +73,13 @@
     "Album": "Fearless"
   },
   {
-    "Title": "Fifteen",
-    "Year": 2009,
-    "Director": "Roman White",
-    "Youtube Id": "Pb-K2tXWK4w",
-    "BPM": 95,
-    "Album": "Fearless"
-  },
-  {
-    "Title": "Fearless",
-    "Year": 2010,
-    "Director": "Todd Cassetty",
-    "Youtube Id": "ptSjNWnzpjg",
-    "BPM": 100,
-    "Album": "Fearless"
+    "Title": "Change",
+    "Year": 2008,
+    "Director": "Shawn Robbins",
+    "Youtube Id": "B1jYllE0T-k",
+    "BPM": 96,
+    "Album": "Fearless",
+    "Concert": true
   },
   {
     "Title": "Mine",
@@ -86,6 +88,15 @@
     "Youtube Id": "XPBwXKgDTdE",
     "BPM": 121,
     "Album": "Speak Now"
+  },
+  {
+    "Title": "Sparks Fly",
+    "Year": 2011,
+    "Director": "Christian Lamb",
+    "Youtube Id": "oKar-tF__ac",
+    "BPM": 126,
+    "Album": "Speak Now",
+    "Concert": true
   },
   {
     "Title": "Back to December",
@@ -112,15 +123,6 @@
     "Album": "Speak Now"
   },
   {
-    "Title": "Sparks Fly",
-    "Year": 2011,
-    "Director": "Christian Lamb",
-    "Youtube Id": "oKar-tF__ac",
-    "BPM": 126,
-    "Album": "Speak Now",
-    "Concert": true
-  },
-  {
     "Title": "Ours",
     "Year": 2011,
     "Director": "Declan Whitebloom",
@@ -137,20 +139,13 @@
     "Album": ""
   },
   {
-    "Title": "We Are Never Ever Getting Back Together",
-    "Year": 2012,
-    "Director": "Declan Whitebloom",
-    "Youtube Id": "WA4iX5D9Z64",
-    "BPM": 88,
-    "Album": "Red"
-  },
-  {
-    "Title": "Begin Again",
-    "Year": 2012,
-    "Director": "Philip Andelman",
-    "Youtube Id": "cMPEd8m79Hw",
-    "BPM": 79,
-    "Album": "Red"
+    "Title": "Red",
+    "Year": 2013,
+    "Director": "Kenny Jackson",
+    "Youtube Id": "Zlot0i3Zykw",
+    "BPM": 125,
+    "Album": "Red",
+    "Concert": true
   },
   {
     "Title": "I Knew You Were Trouble",
@@ -169,21 +164,12 @@
     "Album": "Red"
   },
   {
-    "Title": "Everything Has Changed",
-    "Year": 2013,
-    "Director": "Philip Andelman",
-    "Youtube Id": "w1oM3kQpXRo",
-    "BPM": 80,
+    "Title": "We Are Never Ever Getting Back Together",
+    "Year": 2012,
+    "Director": "Declan Whitebloom",
+    "Youtube Id": "WA4iX5D9Z64",
+    "BPM": 88,
     "Album": "Red"
-  },
-  {
-    "Title": "Red",
-    "Year": 2013,
-    "Director": "Kenny Jackson",
-    "Youtube Id": "Zlot0i3Zykw",
-    "BPM": 125,
-    "Album": "Red",
-    "Concert": true
   },
   {
     "Title": "The Last Time",
@@ -195,12 +181,20 @@
     "Concert": true
   },
   {
-    "Title": "Shake It Off",
-    "Year": 2014,
-    "Director": "Mark Romanek",
-    "Youtube Id": "nfWlot6h_JM",
-    "BPM": 160,
-    "Album": 1989
+    "Title": "Everything Has Changed",
+    "Year": 2013,
+    "Director": "Philip Andelman",
+    "Youtube Id": "w1oM3kQpXRo",
+    "BPM": 80,
+    "Album": "Red"
+  },
+  {
+    "Title": "Begin Again",
+    "Year": 2012,
+    "Director": "Philip Andelman",
+    "Youtube Id": "cMPEd8m79Hw",
+    "BPM": 79,
+    "Album": "Red"
   },
   {
     "Title": "Blank Space",
@@ -219,6 +213,22 @@
     "Album": 1989
   },
   {
+    "Title": "Out of the Woods",
+    "Year": 2015,
+    "Director": "Joseph Kahn",
+    "Youtube Id": "JLf9q36UsBk",
+    "BPM": 92,
+    "Album": 1989
+  },
+  {
+    "Title": "Shake It Off",
+    "Year": 2014,
+    "Director": "Mark Romanek",
+    "Youtube Id": "nfWlot6h_JM",
+    "BPM": 160,
+    "Album": 1989
+  },
+  {
     "Title": "Bad Blood",
     "Year": 2015,
     "Director": "Joseph Kahn",
@@ -232,14 +242,6 @@
     "Director": "Joseph Kahn",
     "Youtube Id": "IdneKLhsWOQ",
     "BPM": 140,
-    "Album": 1989
-  },
-  {
-    "Title": "Out of the Woods",
-    "Year": 2015,
-    "Director": "Joseph Kahn",
-    "Youtube Id": "JLf9q36UsBk",
-    "BPM": 92,
     "Album": 1989
   },
   {
@@ -260,19 +262,19 @@
     "Album": ""
   },
   {
-    "Title": "Look What You Made Me Do",
-    "Year": 2017,
-    "Director": "Joseph Kahn",
-    "Youtube Id": "3tmd-ClpJxA",
-    "BPM": 128,
-    "Album": "Reputation"
-  },
-  {
     "Title": "...Ready For It?",
     "Year": 2017,
     "Director": "Joseph Kahn",
     "Youtube Id": "wIft-t-MQuE",
     "BPM": 160,
+    "Album": "Reputation"
+  },
+  {
+    "Title": "Look What You Made Me Do",
+    "Year": 2017,
+    "Director": "Joseph Kahn",
+    "Youtube Id": "3tmd-ClpJxA",
+    "BPM": 128,
     "Album": "Reputation"
   }
 ]
