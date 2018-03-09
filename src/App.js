@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import _ from 'lodash';
 
-import Beeswarm from './visualizations/Beeswarm';
+import SaturationGraph from './visualizations/SaturationGraph';
 import Video from './Video';
 import BarChart from './visualizations/BarChart';
 import FilterData from './FilterData';
@@ -15,6 +15,7 @@ const videosMetadata = require('./data/metadata.json');
 let videosData = _.chain(require('./data/youtube.json'))
   .map(video => {
     const metadata = _.find(videosMetadata, meta => meta['Youtube Id'] === video.id);
+    const order = videosMetadata.indexOf(metadata);
     return Object.assign(video, require(`./data/${video.id}.json`), {
       title: metadata.Title,
       bpm: metadata.BPM,
@@ -22,8 +23,11 @@ let videosData = _.chain(require('./data/youtube.json'))
       director: metadata.Director,
       album: metadata.Album,
       concert: metadata.Concert,
+      order,
     });
-  }).filter(video => video.album && !video.concert).value();
+  }).filter(video => video.album && !video.concert)
+  .sortBy(video => video.order)
+  .value();
 
 class App extends Component {
   constructor(props) {
@@ -51,8 +55,8 @@ class App extends Component {
     let [groupedHues, groupedSat, groupedLight] = FilterData.groupHSL(filteredVideos);
 
     const videos = _.chain(filteredVideos)
-      .sortBy(video => -video.keepCount / video.totalCount)
-      .take(5)
+      // .sortBy(video => -video.keepCount / video.totalCount)
+      // .take(5)
       .map(video =>
         <Video key={video.id} data={video} filters={this.state} />).value();
 
@@ -97,12 +101,15 @@ class App extends Component {
       filters: this.state,
     }
 
+    // <div style={{padding: 20}}>
+    //   <BarChart {...barProps} data={groupedHues} type='hue' />
+    //   <BarChart {...barProps} data={groupedSat} type='sat' />
+    //   <BarChart {...barProps} data={groupedLight} type='light' />
+    // </div>
+    // {videos}
     return (
       <div className="App">
-        <BarChart {...barProps} data={groupedHues} type='hue' />
-        <BarChart {...barProps} data={groupedSat} type='sat' />
-        <BarChart {...barProps} data={groupedLight} type='light' />
-        {videos}
+        <SaturationGraph videos={filteredVideos} />
       </div>
     );
   }
