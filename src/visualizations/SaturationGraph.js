@@ -133,13 +133,13 @@ class SaturationGraph extends Component {
       .attr('stroke', '#333')
       .attr('stroke-width', 2);
 
-    const fontSize = 12;
+    const fontSize = 10;
     medians.append('text')
       .attr('x', d => (d.bounds[0] + d.bounds[1]) / 2)
       .attr('y', height + fontSize)
       .attr('dy', '.35em')
       .attr('text-anchor', 'middle')
-      .attr('font-size', fontSize)
+      .attr('font-size', fontSize + 2)
       .text(d => d.album);
 
     medians.append('line')
@@ -157,7 +157,7 @@ class SaturationGraph extends Component {
       .attr('text-anchor', 'end')
       .attr('dy', '.35em')
       .attr('font-size', fontSize)
-      .text(d => _.truncate(d.title, {length: 18, omission: ' ...'}));
+      .text(d => _.truncate(d.title, {length: 24, omission: ' ..'}));
   }
 
   render() {
