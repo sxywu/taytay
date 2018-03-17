@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import _ from 'lodash';
 
 import SaturationGraph from './visualizations/SaturationGraph';
+import HueGraph from './visualizations/HueGraph';
 import Video from './Video';
 import BarChart from './visualizations/BarChart';
 import FilterData from './FilterData';
@@ -109,6 +110,7 @@ class App extends Component {
     // {videos}
     return (
       <div className="App">
+        <HueGraph videos={filteredVideos} />
         <SaturationGraph videos={filteredVideos} />
       </div>
     );
