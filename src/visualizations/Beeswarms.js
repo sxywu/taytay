@@ -5,7 +5,7 @@ import chroma from 'chroma-js';
 
 const margin = {left: 5, top: 20, right: 5, bottom: 20};
 let minRadius = 2.5;
-let maxRadius = 12;
+let maxRadius = 10;
 
 class Beeswarms extends Component {
   componentDidMount() {
@@ -20,7 +20,7 @@ class Beeswarms extends Component {
     this.simulation = d3.forceSimulation(this.data)
       .force('x', d3.forceX().x(d => d.focusX))
       .force('y', d3.forceY().y(d => d.focusY))
-      .force('collide', d3.forceCollide().radius(d => 0.75 * d.radius))
+      .force('collide', d3.forceCollide().radius(d => Math.min(4, 0.75 * d.radius)))
       .on('tick', this.onTick);
   }
 
