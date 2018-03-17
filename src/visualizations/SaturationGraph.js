@@ -157,7 +157,7 @@ class SaturationGraph extends Component {
       .attr('text-anchor', 'end')
       .attr('dy', '.35em')
       .attr('font-size', fontSize)
-      .text(d => d.title);
+      .text(d => _.truncate(d.title, {length: 18, omission: ' ...'}));
   }
 
   render() {
