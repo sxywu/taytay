@@ -3,7 +3,7 @@ import {scaleLinear, arc, max, select} from 'd3';
 import _ from 'lodash';
 import chroma from 'chroma-js';
 
-const hueWidth = 300;
+const hueWidth = 150;
 const perRow = 6;
 const numDegrees = 10;
 const margin = {left: 30, top: 20, right: 5, bottom: 20};
@@ -38,29 +38,35 @@ class HueGraph extends Component {
         return {y: (i + 0.5) * hueWidth, videos};
       }).value();
 
-    this.videos = _.chain(this.groups)
-      .map(group => {
-        return _.map(group.videos, (video, i) => {
-          // get rid of light, dark, and gray colors
-          let colors = _.filter(video.colors, color => color.color[1] > 0.2 &&
-            0.2 < color.color[2] && color.color[2] < 0.8);
-          // group into degrees
-          const hues = _.chain(colors)
-            .groupBy(color => Math.floor(color.color[0] / numDegrees))
-            .map((colors, i) => {
-              const startAngle = (+i * numDegrees / 360) * 2 * Math.PI;
-              const endAngle = startAngle + (numDegrees / 180) * Math.PI;
-              const sum = _.sumBy(colors, 'size');
-              colors = _.sortBy(colors, color => -color.color[2]); // sort by lightness
-              return {startAngle, endAngle, sum, colors};
-            }).value();
+    this.videos = _.map(this.groups, group => {
+      return _.map(group.videos, (video, i) => {
+        // get rid of light, dark, and gray colors
+        let colors = _.filter(video.colors, color => color.color[1] > 0.2 &&
+          0.2 < color.color[2] && color.color[2] < 0.8);
+        // group into degrees of hues
+        colors = _.chain(colors)
+          .groupBy(color => Math.floor(color.color[0] / numDegrees))
+          .map((colors, i) => {
+            const startAngle = (+i * numDegrees / 360) * 2 * Math.PI;
+            const endAngle = startAngle + (numDegrees / 180) * Math.PI;
+            const sum = _.sumBy(colors, 'size');
+            colors = _.sortBy(colors, color => -color.color[2]); // sort by lightness
+            return {startAngle, endAngle, sum, colors};
+          }).value();
 
-          const maxHeight = max(hues, hue => hue.sum);
-          heightScale.domain([0, maxHeight]);
+        return {x: video.x, y: group.y, colors};
+      });
+    });
 
+    const maxHeight = max(this.videos, videos => max(videos, video => max(video.colors, hue => hue.sum)));
+    heightScale.domain([0, maxHeight]);
+
+    this.videos = _.chain(this.videos)
+      .map(videos => {
+        return _.map(videos, video => {
           // calculate the positions of each color as they're grouped into hues
           // but then return flattened so it's all the colors for the video again
-          colors = _.chain(hues)
+          const colors = _.chain(video.colors)
             .map(hue => {
               let outerRadius = 0.12 * hueWidth;
 
@@ -77,7 +83,7 @@ class HueGraph extends Component {
               });
             }).flatten().value();
 
-          return {x: video.x, y: group.y, colors};
+          return Object.assign(video, {colors});
         });
       }).flatten().value();
   }
