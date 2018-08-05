@@ -34,11 +34,11 @@ class Block extends Component {
     const grays = [];
     const colors = [];
     _.each(this.props.colors, color => {
-      if (color.color[light] < 0.15) {
+      if (color.color[light] < 0.2) {
         blacks.push(color);
-      } else if (color.color[light] > 0.85) {
+      } else if (color.color[light] > 0.8) {
         whites.push(color);
-      } else if (color.color[sat] < 0.07) {
+      } else if (color.color[sat] < 0.1) {
         grays.push(color);
       } else {
         colors.push(color);
@@ -57,7 +57,7 @@ class Block extends Component {
     _.chain(colors)
       .sortBy(color => {
         const [h, s, l] = color.color;
-        return Math.floor(h / 40) * 40 + l;
+        return Math.floor(h / 20) * 20 + l * 10 + s;
       })
       .each(color => {
         _.times(_.ceil(color.size / perSquare), i => {
@@ -70,7 +70,7 @@ class Block extends Component {
             blockHeight *= (remaining / perSquare);
           }
 
-          this.ctx.fillStyle = renderColor || chroma(h, s, l, 'hsl').hex();
+          this.ctx.fillStyle = renderColor || chroma(Math.floor(h / 20) * 20, s, l, 'hsl').hex();
           this.ctx.strokeStyle = this.ctx.fillStyle;
           this.ctx.fillRect(x, y, blockWidth, blockHeight);
           this.ctx.strokeRect(x, y, blockWidth, blockHeight);

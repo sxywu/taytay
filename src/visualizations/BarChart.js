@@ -65,8 +65,13 @@ class BarChart extends Component {
   }
 
   render() {
+    const style = {
+      position: 'relative',
+      paddingRight: 5,
+      display: 'inline-block',
+    };
     return (
-      <div style={{position: 'relative'}}>
+      <div style={style}>
         <canvas ref='canvas' width={this.props.width} height={this.props.height} />
         <svg ref='svg' style={{position: 'absolute', top: 0, left: 0}}
           width={this.props.width} height={this.props.height} />

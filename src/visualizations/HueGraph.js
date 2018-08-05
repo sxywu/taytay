@@ -3,12 +3,12 @@ import {scaleLinear, arc, max, select} from 'd3';
 import _ from 'lodash';
 import chroma from 'chroma-js';
 
-const hueWidth = 150;
+const hueWidth = 200;
 const perRow = 6;
 const numDegrees = 10;
 const margin = {left: 30, top: 20, right: 5, bottom: 20};
 
-const heightScale = scaleLinear().range([0, 0.36 * hueWidth]);
+const heightScale = scaleLinear().range([0, 0.42 * hueWidth]);
 const arcGenerator = arc();
 
 class HueGraph extends Component {
@@ -29,7 +29,7 @@ class HueGraph extends Component {
       .map((videos, i) => {
         videos = _.map(videos, (video, j) => {
           return {
-            x: (j + 0.75) * hueWidth / 2,
+            x: (j + 0.75) * hueWidth / 5,
             colors: video.colors,
             title: video.title,
             album: video.album,
@@ -68,7 +68,7 @@ class HueGraph extends Component {
           // but then return flattened so it's all the colors for the video again
           const colors = _.chain(video.colors)
             .map(hue => {
-              let outerRadius = 0.12 * hueWidth;
+              let outerRadius = 0.07 * hueWidth;
 
               return _.map(hue.colors, color => {
                 const height = Math.max(heightScale(color.size), 1);
@@ -100,7 +100,7 @@ class HueGraph extends Component {
 
       // first draw bg circles
       _.times(1, i => {
-        const radius = i * (hueWidth * 0.16) + (hueWidth * 0.1);
+        const radius = i * (hueWidth * 0.16) + (hueWidth * 0.06);
         _.times(360 / numDegrees, i => {
           this.ctx.beginPath();
 
@@ -131,15 +131,15 @@ class HueGraph extends Component {
     const group = this.svg.selectAll('.group')
       .data(this.groups).enter().append('g')
       .classed('group', true)
-      .attr('transform', d => `translate(0, ${d.y})`);
+      .attr('transform', d => `translate(0, ${d.y + hueWidth / 4})`);
 
     const titles = group.selectAll('.title')
       .data(d => d.videos).enter().append('g')
       .classed('title', true)
-      .attr('transform', d => `translate(${d.x}, 0)`);
+      .attr('transform', d => `translate(${d.x}, 0)rotate(-90)`);
 
     titles.append('text')
-    .attr('text-anchor', 'middle')
+    .attr('text-anchor', 'end')
     .attr('dy', '.35em')
     .attr('font-size', fontSize)
     .text(d => _.truncate(d.title, {length: 24, omission: ' ..'}))
@@ -149,7 +149,7 @@ class HueGraph extends Component {
 
     titles.insert('rect', 'text')
       .attr('width', d => d.width + 2)
-      .attr('x', d => -d.width / 2 - 1)
+      .attr('x', d => -d.width - 2)
       .attr('height', fontSize + 2)
       .attr('y', -fontSize / 2 - 1)
       .attr('fill', 'rgba(255, 255, 255, 0.5)');

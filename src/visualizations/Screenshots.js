@@ -7,7 +7,7 @@ import FilterData from '../FilterData';
 const ratio = 180 / 320;
 const imageWidth = 160;
 const imageHeight = imageWidth * ratio;
-const barWidth = 10;
+const barWidth = 6;
 
 class Screenshot extends Component {
 
@@ -109,13 +109,15 @@ class Screenshot extends Component {
 
     const filteredImageDatum = this.state.filteredImageData[this.props.hoveredFrame];
     if (!filteredImageDatum) return;
+    const imageDatum = this.state.imageData[this.props.hoveredFrame];
 
     // hovered frame: clear it and then draw image
     const hoveredCanvas = this.canvases.nodes()[this.props.hoveredFrame];
-    d3.select(hoveredCanvas).attr('width', imageWidth + 2 * padding);
+    d3.select(hoveredCanvas).attr('width', 2 * imageWidth + 2 * padding);
     const hoveredCtx = hoveredCanvas.getContext('2d');
-    hoveredCtx.clearRect(0, 0, imageWidth, imageHeight);
-    hoveredCtx.putImageData(filteredImageDatum, padding, 0);
+    hoveredCtx.clearRect(0, 0, 2 * imageWidth, imageHeight);
+    hoveredCtx.putImageData(imageDatum, padding, 0);
+    hoveredCtx.putImageData(filteredImageDatum, imageWidth + padding, 0);
   }
 
 

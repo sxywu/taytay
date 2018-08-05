@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import _ from 'lodash';
 import chroma from 'chroma-js';
 
-import Histogram from './visualizations/Histogram';
+import Block from './visualizations/Block';
 import HeatMap from './visualizations/HeatMap';
 import Screenshots from './visualizations/Screenshots';
 import FilterData from './FilterData';
@@ -56,7 +56,7 @@ class Video extends Component {
       <div style={style}>
         <div><strong>{this.props.data.title} ({this.props.data.year})</strong></div>
         <div>
-          <Histogram {...histoProps} />
+          <Block {...this.props.data} />
           <Screenshots {...screenshotProps} />
         </div>
       </div>
